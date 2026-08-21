@@ -12,4 +12,7 @@ CREATE TABLE IF NOT EXISTS stg.transactions
 )
 ENGINE = MergeTree
 PARTITION BY toYYYYMMDD(transaction_dt)
-ORDER BY (transaction_dt, operation_id);
+ORDER BY (
+    transaction_dt,
+    operation_id
+);

@@ -1,12 +1,14 @@
-CREATE TABLE IF NOT EXISTS raw.transaction_service_events
+CREATE TABLE IF NOT EXISTS raw.kafka_events
 (
-    object_id UUID,
-    object_type LowCardinality(String),
-    sent_dttm DateTime64(3, 'UTC'),
-    event_dttm DateTime64(3, 'UTC'),
-    payload String,
+    kafka_topic LowCardinality(String),
+    kafka_partition UInt16,
+    kafka_offset UInt64,
+    kafka_message String,
     created_at DateTime64(3, 'UTC') DEFAULT now64(3)
 )
 ENGINE = MergeTree
-PARTITION BY toYYYYMMDD(event_dttm)
-ORDER BY (event_dttm, object_type, object_id);
+ORDER BY (
+    kafka_topic,
+    kafka_partition,
+    kafka_offset
+);

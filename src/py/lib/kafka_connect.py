@@ -1,5 +1,3 @@
-import json
-
 from confluent_kafka import Consumer
 
 
@@ -29,14 +27,16 @@ class KafkaConsumer:
             "auto.offset.reset": "earliest",
             "enable.auto.commit": False,
             "error_cb": error_callback,
-            "client.id": "final-project-consumer",
+            "client.id": "raw-loader",
         }
 
-        self._topic = topic
         self._consumer = Consumer(params)
         self._consumer.subscribe([topic])
 
-    def consume(self, timeout: float = 1.0) -> dict | None:
+    def consume(
+        self,
+        timeout: float = 1.0,
+    ) -> tuple[str, int, int, str] | None:
         msg = self._consumer.poll(timeout=timeout)
 
         if msg is None:
@@ -45,9 +45,12 @@ class KafkaConsumer:
         if msg.error():
             raise RuntimeError(msg.error())
 
-        value = msg.value().decode("utf-8")
-
-        return json.loads(value)
+        return (
+            msg.topic(),
+            msg.partition(),
+            msg.offset(),
+            msg.value().decode("utf-8"),
+        )
 
     def commit(self) -> None:
         self._consumer.commit(asynchronous=False)

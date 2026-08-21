@@ -7,4 +7,8 @@ CREATE TABLE IF NOT EXISTS stg.currencies
 )
 ENGINE = MergeTree
 PARTITION BY toYYYYMMDD(date_update)
-ORDER BY (date_update, currency_code, currency_code_with);
+ORDER BY (
+    date_update,
+    currency_code,
+    currency_code_with
+);
