@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ from kafka_connect import KafkaConsumer
 from raw_repository import RawRepository
 
 
-BATCH_SIZE = 500
+BATCH_SIZE = 1000
 FLUSH_INTERVAL_SECONDS = 5
 
 ALLOWED_OBJECT_TYPES = {
@@ -45,7 +45,9 @@ class KafkaToRawProcessor:
             return (
                 UUID(message["object_id"]),
                 object_type,
-                datetime.fromisoformat(message["sent_dttm"]),
+                datetime.fromisoformat(
+                    message["sent_dttm"]
+                ).replace(tzinfo=timezone.utc),
                 json.dumps(
                     message["payload"],
                     ensure_ascii=False,
