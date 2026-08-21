@@ -1,10 +1,8 @@
-from typing import Sequence
-
 import clickhouse_connect
 from clickhouse_connect.driver.client import Client
 
 
-class RawRepository:
+class ClickHouseClient:
     def __init__(
         self,
         host: str,
@@ -24,21 +22,9 @@ class RawRepository:
             ca_cert=cert_path,
         )
 
-    def save_events(self, events: Sequence[tuple]) -> None:
-        if not events:
-            return
-
-        self._client.insert(
-            "raw.transaction_service_events",
-            events,
-            column_names=[
-                "object_id",
-                "object_type",
-                "sent_dttm",
-                "event_dttm",
-                "payload",
-            ],
-        )
+    @property
+    def client(self) -> Client:
+        return self._client
 
     def close(self) -> None:
         self._client.close()

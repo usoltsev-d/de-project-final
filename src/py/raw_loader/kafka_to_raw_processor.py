@@ -1,23 +1,15 @@
-import json
 import logging
 import os
 import time
-from datetime import datetime, timezone
-from uuid import UUID
 
 from dotenv import load_dotenv
 
-from kafka_connect import KafkaConsumer
+from lib.kafka_connect import KafkaConsumer
 from raw_repository import RawRepository
 
 
 BATCH_SIZE = 1000
 FLUSH_INTERVAL_SECONDS = 5
-
-ALLOWED_OBJECT_TYPES = {
-    "TRANSACTION",
-    "CURRENCY",
-}
 
 
 class KafkaToRawProcessor:
@@ -31,74 +23,23 @@ class KafkaToRawProcessor:
         self._repository = repository
         self._logger = logger
 
-    def _parse_event(self, message: dict) -> tuple | None:
-        object_type = message.get("object_type")
-
-        if object_type not in ALLOWED_OBJECT_TYPES:
-            self._logger.info(
-                "Service or unknown message skipped: %s",
-                message,
-            )
-            return None
-
-        try:
-            payload = message["payload"]
-
-            if object_type == "TRANSACTION":
-                event_dttm = datetime.fromisoformat(
-                    payload["transaction_dt"]
-                ).replace(tzinfo=timezone.utc)
-
-            if object_type == "CURRENCY":
-                event_dttm = datetime.fromisoformat(
-                    payload["date_update"]
-                ).replace(tzinfo=timezone.utc)
-
-            return (
-                UUID(message["object_id"]),
-                object_type,
-                datetime.fromisoformat(
-                    message["sent_dttm"]
-                ).replace(tzinfo=timezone.utc),
-                event_dttm,
-                json.dumps(
-                    payload,
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                ),
-            )
-
-        except (KeyError, TypeError, ValueError) as exc:
-            self._logger.warning(
-                "Invalid event skipped: %s. Error: %s",
-                message,
-                exc,
-            )
-            return None
-
     def run(self) -> None:
         self._logger.info("Kafka to RAW consumer started")
 
         batch = []
-        has_consumed_messages = False
         last_flush_time = time.monotonic()
 
         try:
             while True:
-                message = self._consumer.consume()
+                event = self._consumer.consume()
 
-                if message is not None:
-                    has_consumed_messages = True
-
-                    event = self._parse_event(message)
-
-                    if event is not None:
-                        batch.append(event)
+                if event is not None:
+                    batch.append(event)
 
                 flush_required = (
                     len(batch) >= BATCH_SIZE
                     or (
-                        has_consumed_messages
+                        batch
                         and time.monotonic() - last_flush_time
                         >= FLUSH_INTERVAL_SECONDS
                     )
@@ -109,22 +50,21 @@ class KafkaToRawProcessor:
 
                 self._repository.save_events(batch)
 
-                # Commit делаем только после успешного INSERT.
+                # Offset подтверждаем только после успешной записи батча в ClickHouse.
                 self._consumer.commit()
 
                 self._logger.info(
-                    "Batch processed. Saved business events: %s",
+                    "Batch processed. Saved events: %s",
                     len(batch),
                 )
 
                 batch.clear()
-                has_consumed_messages = False
                 last_flush_time = time.monotonic()
 
         except KeyboardInterrupt:
             self._logger.info("Stopping consumer")
 
-            if has_consumed_messages:
+            if batch:
                 try:
                     self._repository.save_events(batch)
                     self._consumer.commit()
@@ -141,8 +81,6 @@ class KafkaToRawProcessor:
                     )
 
         except Exception:
-            # Если запись в ClickHouse упала, commit не выполняется.
-            # После перезапуска Kafka отдаст события повторно.
             self._logger.exception(
                 "Consumer stopped because of an error. "
                 "Kafka offset was not committed."
