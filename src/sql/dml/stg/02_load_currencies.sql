@@ -5,23 +5,30 @@ INSERT INTO stg.currencies
     currency_code_with,
     currency_with_div
 )
-WITH
-    JSONExtractRaw(kafka_message, 'payload') AS payload
+WITH JSONExtract(
+    kafka_message,
+    'Tuple(
+        object_type String,
+        payload Tuple(
+            date_update String,
+            currency_code UInt32,
+            currency_code_with UInt32,
+            currency_with_div Decimal64(8)
+        )
+    )'
+) AS event
 SELECT
     parseDateTime64BestEffort(
-        JSONExtractString(payload, 'date_update'),
+        event.payload.date_update,
         3,
         'UTC'
     ),
-    JSONExtractUInt(payload, 'currency_code'),
-    JSONExtractUInt(payload, 'currency_code_with'),
-    toDecimal64(
-        JSONExtractRaw(payload, 'currency_with_div'),
-        8
-    )
+    event.payload.currency_code,
+    event.payload.currency_code_with,
+    event.payload.currency_with_div
 FROM raw.kafka_events
 WHERE kafka_topic = {kafka_topic:String}
 AND kafka_partition = {kafka_partition:UInt16}
 AND kafka_offset > {offset_from:Int64}
 AND kafka_offset <= {offset_to:Int64}
-AND JSONExtractString(kafka_message, 'object_type') = 'CURRENCY';
+AND event.object_type = 'CURRENCY';
