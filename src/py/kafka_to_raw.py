@@ -42,14 +42,27 @@ class KafkaToRawProcessor:
             return None
 
         try:
+            payload = message["payload"]
+
+            if object_type == "TRANSACTION":
+                event_dttm = datetime.fromisoformat(
+                    payload["transaction_dt"]
+                ).replace(tzinfo=timezone.utc)
+
+            if object_type == "CURRENCY":
+                event_dttm = datetime.fromisoformat(
+                    payload["date_update"]
+                ).replace(tzinfo=timezone.utc)
+
             return (
                 UUID(message["object_id"]),
                 object_type,
                 datetime.fromisoformat(
                     message["sent_dttm"]
                 ).replace(tzinfo=timezone.utc),
+                event_dttm,
                 json.dumps(
-                    message["payload"],
+                    payload,
                     ensure_ascii=False,
                     separators=(",", ":"),
                 ),
