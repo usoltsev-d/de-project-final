@@ -1,5 +1,4 @@
 import json
-from typing import Dict, Optional
 
 from confluent_kafka import Consumer
 
@@ -37,7 +36,7 @@ class KafkaConsumer:
         self._consumer = Consumer(params)
         self._consumer.subscribe([topic])
 
-    def consume(self, timeout: float = 1.0) -> Optional[Dict]:
+    def consume(self, timeout: float = 1.0) -> dict | None:
         msg = self._consumer.poll(timeout=timeout)
 
         if msg is None:
