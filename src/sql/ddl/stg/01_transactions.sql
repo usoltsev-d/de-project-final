@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS stg.transactions
     transaction_dt DateTime64(3, 'UTC')
 )
 ENGINE = MergeTree
-PARTITION BY toYYYYMM(transaction_dt)
+PARTITION BY toYYYYMMDD(transaction_dt)
 ORDER BY (transaction_dt, operation_id);

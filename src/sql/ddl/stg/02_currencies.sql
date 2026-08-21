@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS stg.currencies
     currency_with_div Decimal64(8)
 )
 ENGINE = MergeTree
-PARTITION BY toYYYYMM(date_update)
+PARTITION BY toYYYYMMDD(date_update)
 ORDER BY (date_update, currency_code, currency_code_with);
