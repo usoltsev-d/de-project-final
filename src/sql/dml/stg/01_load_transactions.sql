@@ -10,19 +10,34 @@ INSERT INTO stg.transactions
     amount,
     transaction_dt
 )
-WITH
-    JSONExtractRaw(kafka_message, 'payload') AS payload
+WITH JSONExtract(
+    kafka_message,
+    'Tuple(
+        object_type String,
+        payload Tuple(
+            operation_id UUID,
+            account_number_from UInt64,
+            account_number_to UInt64,
+            currency_code UInt32,
+            country String,
+            status String,
+            transaction_type String,
+            amount UInt64,
+            transaction_dt String
+        )
+    )'
+) AS event
 SELECT
-    toUUID(JSONExtractString(payload, 'operation_id')),
-    JSONExtractUInt(payload, 'account_number_from'),
-    JSONExtractUInt(payload, 'account_number_to'),
-    JSONExtractUInt(payload, 'currency_code'),
-    JSONExtractString(payload, 'country'),
-    JSONExtractString(payload, 'status'),
-    JSONExtractString(payload, 'transaction_type'),
-    JSONExtractUInt(payload, 'amount'),
+    event.payload.operation_id,
+    event.payload.account_number_from,
+    event.payload.account_number_to,
+    event.payload.currency_code,
+    event.payload.country,
+    event.payload.status,
+    event.payload.transaction_type,
+    event.payload.amount,
     parseDateTime64BestEffort(
-        JSONExtractString(payload, 'transaction_dt'),
+        event.payload.transaction_dt,
         3,
         'UTC'
     )
@@ -31,4 +46,4 @@ WHERE kafka_topic = {kafka_topic:String}
 AND kafka_partition = {kafka_partition:UInt16}
 AND kafka_offset > {offset_from:Int64}
 AND kafka_offset <= {offset_to:Int64}
-AND JSONExtractString(kafka_message, 'object_type') = 'TRANSACTION';
+AND event.object_type = 'TRANSACTION';
