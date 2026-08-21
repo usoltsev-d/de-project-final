@@ -20,7 +20,7 @@ class RawRepository:
                 "kafka_topic",
                 "kafka_partition",
                 "kafka_offset",
-                "message",
+                "kafka_message",
             ],
         )
 

@@ -5,8 +5,8 @@ import time
 from dotenv import load_dotenv
 
 from lib.kafka_connect import KafkaConsumer
-from raw_repository import RawRepository
 from lib.clickhouse_client import ClickHouseClient
+from raw_loader.raw_repository import RawRepository
 
 
 BATCH_SIZE = 1000
