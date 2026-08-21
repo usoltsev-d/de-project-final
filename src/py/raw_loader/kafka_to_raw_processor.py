@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from lib.kafka_connect import KafkaConsumer
 from raw_repository import RawRepository
+from lib.clickhouse_client import ClickHouseClient
 
 
 BATCH_SIZE = 1000
@@ -113,7 +114,7 @@ def main() -> None:
         cert_path=os.environ["YC_CA_PATH"],
     )
 
-    repository = RawRepository(
+    clickhouse = ClickHouseClient(
         host=os.environ["CLICKHOUSE_HOST"],
         port=int(os.environ.get("CLICKHOUSE_PORT", "8443")),
         user=os.environ["CLICKHOUSE_USER"],
@@ -125,6 +126,9 @@ def main() -> None:
         cert_path=os.environ["YC_CA_PATH"],
     )
 
+    repository = RawRepository(
+        clickhouse=clickhouse,
+    )
     processor = KafkaToRawProcessor(
         consumer=consumer,
         repository=repository,

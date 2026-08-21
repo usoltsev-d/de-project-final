@@ -23,3 +23,6 @@ class RawRepository:
                 "message",
             ],
         )
+
+    def close(self) -> None:
+        self._clickhouse.close()
