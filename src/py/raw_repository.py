@@ -35,6 +35,7 @@ class RawRepository:
                 "object_id",
                 "object_type",
                 "sent_dttm",
+                "event_dttm",
                 "payload",
             ],
         )
