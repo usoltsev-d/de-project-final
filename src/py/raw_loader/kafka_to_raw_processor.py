@@ -9,7 +9,7 @@ from lib.clickhouse_client import ClickHouseClient
 from raw_loader.raw_repository import RawRepository
 
 
-BATCH_SIZE = 1000
+BATCH_SIZE = 5000
 FLUSH_INTERVAL_SECONDS = 5
 
 
