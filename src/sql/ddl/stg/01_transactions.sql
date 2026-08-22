@@ -8,11 +8,9 @@ CREATE TABLE IF NOT EXISTS stg.transactions
     status LowCardinality(String),
     transaction_type LowCardinality(String),
     amount UInt64,
-    transaction_dt DateTime64(3, 'UTC')
+    transaction_dt DateTime64(3, 'UTC'),
+    load_dttm DateTime64(3, 'UTC') DEFAULT now64(3)
 )
 ENGINE = MergeTree
 PARTITION BY toYYYYMMDD(transaction_dt)
-ORDER BY (
-    transaction_dt,
-    operation_id
-);
+ORDER BY transaction_dt;
