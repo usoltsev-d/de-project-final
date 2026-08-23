@@ -4,7 +4,7 @@ from collections.abc import Callable
 from stg_loader.checkpoint import FileCheckpoint
 
 
-BATCH_SIZE = 100_000
+BATCH_SIZE = 10000
 
 
 class RawToStgProcessor:

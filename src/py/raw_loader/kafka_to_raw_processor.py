@@ -28,7 +28,7 @@ class KafkaToRawProcessor:
         self._logger.info("Kafka to RAW consumer started")
 
         batch = []
-        last_flush_time = time.monotonic()
+        last_message_time = time.monotonic()
 
         try:
             while True:
@@ -36,31 +36,43 @@ class KafkaToRawProcessor:
 
                 if event is not None:
                     batch.append(event)
+                    last_message_time = time.monotonic()
 
-                flush_required = (
-                    len(batch) >= BATCH_SIZE
-                    or (
-                        batch
-                        and time.monotonic() - last_flush_time
-                        >= FLUSH_INTERVAL_SECONDS
+                if len(batch) >= BATCH_SIZE:
+                    self._repository.save_events(batch)
+
+                    # Offset подтверждаем только после успешной записи батча в ClickHouse.
+                    self._consumer.commit()
+
+                    self._logger.info(
+                        "Batch processed. Saved events: %s",
+                        len(batch),
                     )
+
+                    batch.clear()
+                    continue
+
+                idle_flush_required = (
+                    batch
+                    and time.monotonic() - last_message_time
+                    >= FLUSH_INTERVAL_SECONDS
                 )
 
-                if not flush_required:
+                if not idle_flush_required:
                     continue
 
                 self._repository.save_events(batch)
 
-                # Offset подтверждаем только после успешной записи батча в ClickHouse.
+                # Если новые сообщения перестали поступать,
+                # записываем оставшийся неполный батч.
                 self._consumer.commit()
 
                 self._logger.info(
-                    "Batch processed. Saved events: %s",
+                    "Partial batch processed. Saved events: %s",
                     len(batch),
                 )
 
                 batch.clear()
-                last_flush_time = time.monotonic()
 
         except KeyboardInterrupt:
             self._logger.info("Stopping consumer")
