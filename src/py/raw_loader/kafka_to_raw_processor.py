@@ -40,8 +40,6 @@ class KafkaToRawProcessor:
                 if len(batch) >= BATCH_SIZE:
                     saved_events = self._repository.save_events(batch)
 
-                    self._repository.save_events(batch)
-
                     # Offset подтверждаем только после успешной записи батча в ClickHouse.
                     self._consumer.commit()
 
