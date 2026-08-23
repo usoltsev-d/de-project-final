@@ -10,8 +10,7 @@ from raw_loader.raw_repository import RawRepository
 
 
 BATCH_SIZE = 5000
-FLUSH_INTERVAL_SECONDS = 5
-
+IDLE_FLUSH_SECONDS = 5
 
 class KafkaToRawProcessor:
     def __init__(
@@ -39,14 +38,18 @@ class KafkaToRawProcessor:
                     last_message_time = time.monotonic()
 
                 if len(batch) >= BATCH_SIZE:
+                    saved_events = self._repository.save_events(batch)
+
                     self._repository.save_events(batch)
 
                     # Offset подтверждаем только после успешной записи батча в ClickHouse.
                     self._consumer.commit()
 
                     self._logger.info(
-                        "Batch processed. Saved events: %s",
+                        "Batch processed. Received events: %s, saved events: %s, skipped duplicates: %s",
                         len(batch),
+                        saved_events,
+                        len(batch) - saved_events,
                     )
 
                     batch.clear()
@@ -55,21 +58,23 @@ class KafkaToRawProcessor:
                 idle_flush_required = (
                     batch
                     and time.monotonic() - last_message_time
-                    >= FLUSH_INTERVAL_SECONDS
+                    >= IDLE_FLUSH_SECONDS
                 )
 
                 if not idle_flush_required:
                     continue
 
-                self._repository.save_events(batch)
+                saved_events = self._repository.save_events(batch)
 
                 # Если новые сообщения перестали поступать,
                 # записываем оставшийся неполный батч.
                 self._consumer.commit()
 
                 self._logger.info(
-                    "Partial batch processed. Saved events: %s",
+                    "Partial batch processed. Received events: %s, saved events: %s, skipped duplicates: %s",
                     len(batch),
+                    saved_events,
+                    len(batch) - saved_events,
                 )
 
                 batch.clear()
@@ -79,12 +84,15 @@ class KafkaToRawProcessor:
 
             if batch:
                 try:
-                    self._repository.save_events(batch)
+                    saved_events = self._repository.save_events(batch)
+
                     self._consumer.commit()
 
                     self._logger.info(
-                        "Final batch processed. Saved events: %s",
+                        "Final batch processed. Received events: %s, saved events: %s, skipped duplicates: %s",
                         len(batch),
+                        saved_events,
+                        len(batch) - saved_events,
                     )
 
                 except Exception:
