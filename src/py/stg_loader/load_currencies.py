@@ -41,7 +41,7 @@ def main() -> None:
     )
 
     checkpoint = FileCheckpoint(
-        CHECKPOINT_DIR / "stg_transactions.offset"
+        CHECKPOINT_DIR / "stg_currencies.offset"
     )
 
     processor = RawToStgProcessor(
