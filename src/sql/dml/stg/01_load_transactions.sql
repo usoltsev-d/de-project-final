@@ -16,13 +16,13 @@ WITH JSONExtract(
         object_type String,
         payload Tuple(
             operation_id UUID,
-            account_number_from UInt64,
-            account_number_to UInt64,
-            currency_code UInt32,
+            account_number_from Int64,
+            account_number_to Int64,
+            currency_code Int32,
             country String,
             status String,
             transaction_type String,
-            amount UInt64,
+            amount Int64,
             transaction_dt String
         )
     )'

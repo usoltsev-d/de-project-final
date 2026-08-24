@@ -11,8 +11,8 @@ WITH JSONExtract(
         object_type String,
         payload Tuple(
             date_update String,
-            currency_code UInt32,
-            currency_code_with UInt32,
+            currency_code Int32,
+            currency_code_with Int32,
             currency_with_div Decimal64(8)
         )
     )'
