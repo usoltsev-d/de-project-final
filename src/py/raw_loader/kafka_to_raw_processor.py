@@ -23,10 +23,6 @@ class KafkaToRawProcessor:
         self._repository = repository
         self._logger = logger
 
-BATCH_SIZE = 5000
-FLUSH_INTERVAL_SECONDS = 30
-
-class KafkaToRawProcessor:
     def run(self) -> None:
         self._logger.info("Kafka to RAW consumer started")
 
