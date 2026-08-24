@@ -10,7 +10,7 @@ from raw_loader.raw_repository import RawRepository
 
 
 BATCH_SIZE = 5000
-IDLE_FLUSH_SECONDS = 5
+FLUSH_INTERVAL_SECONDS = 30
 
 class KafkaToRawProcessor:
     def __init__(
@@ -23,11 +23,15 @@ class KafkaToRawProcessor:
         self._repository = repository
         self._logger = logger
 
+BATCH_SIZE = 5000
+FLUSH_INTERVAL_SECONDS = 30
+
+class KafkaToRawProcessor:
     def run(self) -> None:
         self._logger.info("Kafka to RAW consumer started")
 
         batch = []
-        last_message_time = time.monotonic()
+        last_flush_time = time.monotonic()
 
         try:
             while True:
@@ -35,47 +39,36 @@ class KafkaToRawProcessor:
 
                 if event is not None:
                     batch.append(event)
-                    last_message_time = time.monotonic()
 
-                if len(batch) >= BATCH_SIZE:
-                    saved_events = self._repository.save_events(batch)
-
-                    # Offset подтверждаем только после успешной записи батча в ClickHouse.
-                    self._consumer.commit()
-
-                    self._logger.info(
-                        "Batch processed. Received events: %s, saved events: %s, skipped duplicates: %s",
-                        len(batch),
-                        saved_events,
-                        len(batch) - saved_events,
+                # Записываем batch либо при достижении максимального размера,
+                # либо по таймеру, чтобы данные не задерживались при низком потоке.
+                flush_required = (
+                    len(batch) >= BATCH_SIZE
+                    or (
+                        batch
+                        and time.monotonic() - last_flush_time
+                        >= FLUSH_INTERVAL_SECONDS
                     )
-
-                    batch.clear()
-                    continue
-
-                idle_flush_required = (
-                    batch
-                    and time.monotonic() - last_message_time
-                    >= IDLE_FLUSH_SECONDS
                 )
 
-                if not idle_flush_required:
+                if not flush_required:
                     continue
 
                 saved_events = self._repository.save_events(batch)
 
-                # Если новые сообщения перестали поступать,
-                # записываем оставшийся неполный батч.
+                # Offset подтверждаем только после успешной записи batch в ClickHouse.
                 self._consumer.commit()
 
                 self._logger.info(
-                    "Partial batch processed. Received events: %s, saved events: %s, skipped duplicates: %s",
+                    "Batch processed. Received events: %s, "
+                    "saved events: %s, skipped duplicates: %s",
                     len(batch),
                     saved_events,
                     len(batch) - saved_events,
                 )
 
                 batch.clear()
+                last_flush_time = time.monotonic()
 
         except KeyboardInterrupt:
             self._logger.info("Stopping consumer")
