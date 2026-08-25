@@ -12,7 +12,7 @@ from raw_loader.raw_repository import RawRepository
 BATCH_SIZE = 5000
 FLUSH_INTERVAL_SECONDS = 30
 
-class KafkaToRawProcessor:
+class RawProcessor:
     def __init__(
         self,
         consumer: KafkaConsumer,
