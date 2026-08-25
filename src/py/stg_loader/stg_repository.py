@@ -3,32 +3,20 @@ from pathlib import Path
 from lib.clickhouse_client import ClickHouseClient
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-
 class StgRepository:
     def __init__(
         self,
         clickhouse: ClickHouseClient,
+        sql_dir: Path,
     ) -> None:
         self._clickhouse = clickhouse
 
         self._transactions_sql = (
-            PROJECT_ROOT
-            / "src"
-            / "sql"
-            / "dml"
-            / "stg"
-            / "load_transactions.sql"
+            sql_dir / "load_transactions.sql"
         ).read_text(encoding="utf-8")
 
         self._currencies_sql = (
-            PROJECT_ROOT
-            / "src"
-            / "sql"
-            / "dml"
-            / "stg"
-            / "load_currencies.sql"
+            sql_dir / "load_currencies.sql"
         ).read_text(encoding="utf-8")
 
     def get_max_raw_offset(
