@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from lib.clickhouse_client import ClickHouseClient
 from stg_loader.checkpoint import FileCheckpoint
-from stg_loader.raw_to_stg_processor import RawToStgProcessor
+from stg_loader.stg_processor import StgProcessor
 from stg_loader.stg_repository import StgRepository
 
 CHECKPOINT_DIR = Path(__file__).resolve().parent / "checkpoints"
@@ -47,7 +47,7 @@ def main() -> None:
         CHECKPOINT_DIR / "stg_currencies.offset"
     )
 
-    processor = RawToStgProcessor(
+    processor = StgProcessor(
         checkpoint=checkpoint,
         get_high_watermark=lambda: repository.get_max_raw_offset(
             kafka_topic=kafka_topic,
