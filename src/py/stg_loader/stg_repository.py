@@ -19,7 +19,7 @@ class StgRepository:
             / "sql"
             / "dml"
             / "stg"
-            / "01_load_transactions.sql"
+            / "load_transactions.sql"
         ).read_text(encoding="utf-8")
 
         self._currencies_sql = (
@@ -28,7 +28,7 @@ class StgRepository:
             / "sql"
             / "dml"
             / "stg"
-            / "02_load_currencies.sql"
+            / "load_currencies.sql"
         ).read_text(encoding="utf-8")
 
     def get_max_raw_offset(
