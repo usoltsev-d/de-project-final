@@ -7,7 +7,7 @@ from stg_loader.checkpoint import FileCheckpoint
 BATCH_SIZE = 10000
 
 
-class RawToStgProcessor:
+class StgProcessor:
     def __init__(
         self,
         checkpoint: FileCheckpoint,
