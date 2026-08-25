@@ -3,6 +3,7 @@ from pathlib import Path
 
 from lib.clickhouse_client import ClickHouseClient
 
+
 class DdsRepository:
     def __init__(
         self,

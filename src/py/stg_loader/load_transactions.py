@@ -38,8 +38,11 @@ def main() -> None:
         cert_path=os.environ["YC_CA_PATH"],
     )
 
+    sql_dir = Path("src/sql/dml/stg")
+
     repository = StgRepository(
         clickhouse=clickhouse,
+        sql_dir=sql_dir,
     )
 
     checkpoint = FileCheckpoint(
