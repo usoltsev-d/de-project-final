@@ -1,4 +1,4 @@
-INSERT INTO dds.fct_transactions
+INSERT INTO dds.fct_transactions_shadow
 (
     operation_id,
     account_number_from,
