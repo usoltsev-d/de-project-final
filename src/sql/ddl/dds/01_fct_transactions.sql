@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS stg.fct_transactions
+CREATE TABLE IF NOT EXISTS dds.fct_transactions
 (
     operation_id UUID,
     account_number_from Int64,
