@@ -1,6 +1,6 @@
+import argparse
 import logging
 import os
-import argparse
 from datetime import date
 from pathlib import Path
 
@@ -50,6 +50,7 @@ def main(
         processor.run(process_date)
     finally:
         repository.close()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
