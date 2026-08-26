@@ -26,7 +26,7 @@ def main() -> None:
         password=os.environ["KAFKA_PASSWORD"],
         topic=os.environ["KAFKA_TOPIC"],
         group=os.environ["KAFKA_CONSUMER_GROUP"],
-        cert_path=os.environ["YC_CA_PATH"],
+        cert_path=os.environ["CERT_PATH"],
     )
 
     clickhouse = ClickHouseClient(
@@ -38,7 +38,7 @@ def main() -> None:
             "CLICKHOUSE_DATABASE",
             "raw",
         ),
-        cert_path=os.environ["YC_CA_PATH"],
+        cert_path=os.environ["CERT_PATH"],
     )
 
     repository = RawRepository(
