@@ -24,7 +24,7 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
-        partition_id = int(process_date.strftime("%Y%m%d"))
+        partition_id = self._get_partition_id(process_date)
 
         self._clickhouse.client.command(
             """
@@ -40,12 +40,10 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
-        partition_id = int(process_date.strftime("%Y%m%d"))
-
         self._clickhouse.client.command(
             self._transactions_sql,
             parameters={
-                "partition_id": partition_id,
+                "process_date": process_date
             },
         )
 
@@ -86,12 +84,10 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
-        partition_id = int(process_date.strftime("%Y%m%d"))
-
         self._clickhouse.client.command(
             self._currency_rates_sql,
             parameters={
-                "partition_id": partition_id,
+                "process_date": process_date
             },
         )
 
@@ -99,7 +95,7 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
-        partition_id = int(process_date.strftime("%Y%m%d"))
+        partition_id = self._get_partition_id(process_date)
 
         self._clickhouse.client.command(
             """
@@ -111,6 +107,12 @@ class DdsRepository:
                 "partition_id": partition_id,
             },
         )
+
+    def _get_partition_id(
+        self,
+        process_date: date,
+    ) -> int:
+        return int(process_date.strftime("%Y%m%d"))
 
     def close(self) -> None:
         self._clickhouse.close()
