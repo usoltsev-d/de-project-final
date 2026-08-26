@@ -43,7 +43,7 @@ class DdsRepository:
         self._clickhouse.client.command(
             self._transactions_sql,
             parameters={
-                "process_date": process_date
+                "process_date": process_date,
             },
         )
 
@@ -87,7 +87,7 @@ class DdsRepository:
         self._clickhouse.client.command(
             self._currency_rates_sql,
             parameters={
-                "process_date": process_date
+                "process_date": process_date,
             },
         )
 
