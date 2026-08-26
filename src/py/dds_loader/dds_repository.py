@@ -24,13 +24,15 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
+        partition_id = int(process_date.strftime("%Y%m%d"))
+
         self._clickhouse.client.command(
             """
             ALTER TABLE dds.fct_transactions_shadow
             DROP PARTITION toYYYYMMDD({process_date:Date})
             """,
             parameters={
-                "process_date": process_date,
+                "partition_id": partition_id,
             },
         )
 
@@ -38,10 +40,12 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
+        partition_id = int(process_date.strftime("%Y%m%d"))
+
         self._clickhouse.client.command(
             self._transactions_sql,
             parameters={
-                "process_date": process_date,
+                "partition_id": partition_id,
             },
         )
 
@@ -49,6 +53,8 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
+        partition_id = self._get_partition_id(process_date)
+
         self._clickhouse.client.command(
             """
             ALTER TABLE dds.fct_transactions
@@ -56,7 +62,7 @@ class DdsRepository:
             FROM dds.fct_transactions_shadow
             """,
             parameters={
-                "process_date": process_date,
+                "partition_id": partition_id,
             },
         )
 
