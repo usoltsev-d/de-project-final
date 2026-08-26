@@ -18,7 +18,7 @@ def main() -> None:
                 f'{os.environ.get("KAFKA_PORT", "9091")}'
             ),
             "security.protocol": "SASL_SSL",
-            "ssl.ca.location": os.environ["YC_CA_PATH"],
+            "ssl.ca.location": os.environ["CERT_PATH"],
             "sasl.mechanism": "SCRAM-SHA-512",
             "sasl.username": os.environ["KAFKA_USER"],
             "sasl.password": os.environ["KAFKA_PASSWORD"],

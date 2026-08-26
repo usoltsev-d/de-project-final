@@ -35,7 +35,7 @@ def main() -> None:
             "CLICKHOUSE_DATABASE",
             "raw",
         ),
-        cert_path=os.environ["YC_CA_PATH"],
+        cert_path=os.environ["CERT_PATH"],
     )
 
     sql_dir = Path("src/sql/dml/stg")
