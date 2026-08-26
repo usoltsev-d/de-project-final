@@ -29,7 +29,7 @@ class DdsRepository:
         self._clickhouse.client.command(
             """
             ALTER TABLE dds.fct_transactions_shadow
-            DROP PARTITION toYYYYMMDD({process_date:Date})
+            DROP PARTITION {partition_id:UInt32}
             """,
             parameters={
                 "partition_id": partition_id,
@@ -58,7 +58,7 @@ class DdsRepository:
         self._clickhouse.client.command(
             """
             ALTER TABLE dds.fct_transactions
-            REPLACE PARTITION toYYYYMMDD({process_date:Date})
+            REPLACE PARTITION {partition_id:UInt32}
             FROM dds.fct_transactions_shadow
             """,
             parameters={
@@ -70,13 +70,15 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
+        partition_id = self._get_partition_id(process_date)
+
         self._clickhouse.client.command(
             """
             ALTER TABLE dds.fct_currency_rates_shadow
-            DROP PARTITION toYYYYMMDD({process_date:Date})
+            DROP PARTITION {partition_id:UInt32}
             """,
             parameters={
-                "process_date": process_date,
+                "partition_id": partition_id,
             },
         )
 
@@ -84,10 +86,12 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
+        partition_id = int(process_date.strftime("%Y%m%d"))
+
         self._clickhouse.client.command(
             self._currency_rates_sql,
             parameters={
-                "process_date": process_date,
+                "partition_id": partition_id,
             },
         )
 
@@ -95,14 +99,16 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
+        partition_id = int(process_date.strftime("%Y%m%d"))
+
         self._clickhouse.client.command(
             """
             ALTER TABLE dds.fct_currency_rates
-            REPLACE PARTITION toYYYYMMDD({process_date:Date})
+            REPLACE PARTITION {partition_id:UInt32}
             FROM dds.fct_currency_rates_shadow
             """,
             parameters={
-                "process_date": process_date,
+                "partition_id": partition_id,
             },
         )
 
