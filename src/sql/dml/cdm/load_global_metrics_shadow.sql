@@ -33,7 +33,7 @@ WITH transactions_agg AS
     GROUP BY
         date_update,
         currency_from
-),
+)
 SELECT
     t.date_update,
     t.currency_from,
@@ -59,7 +59,7 @@ SELECT
     ) AS avg_transactions_per_account,
     t.cnt_accounts_make_transactions
 FROM transactions_agg AS t
-LEFT JOIN currency_rates AS r
+LEFT JOIN dds.fct_currency_rates AS r
     ON r.rate_date = t.date_update
     AND r.currency_from = t.currency_from
     AND r.currency_to = 420; -- Для расчёта amount_total нужны курсы всех валют относительно USD.
