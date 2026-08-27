@@ -23,14 +23,18 @@ def main() -> None:
 
     clickhouse = ClickHouseClient(
         host=os.environ["CLICKHOUSE_HOST"],
-        port=int(os.environ.get("CLICKHOUSE_PORT", "8443")),
+        port=int(os.environ["CLICKHOUSE_PORT"]),
         user=os.environ["CLICKHOUSE_USER"],
         password=os.environ["CLICKHOUSE_PASSWORD"],
         database=os.environ.get(
             "CLICKHOUSE_DATABASE",
             "raw",
         ),
-        cert_path=os.environ["CERT_PATH"],
+        secure=os.environ.get(
+            "CLICKHOUSE_SECURE",
+            "false",
+        ).lower() == "true",
+        cert_path=os.environ.get("CERT_PATH"),
     )
 
     sql_dir = Path("src/sql/dml/stg")

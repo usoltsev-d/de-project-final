@@ -8,27 +8,31 @@ def error_callback(err) -> None:
 class KafkaConsumer:
     def __init__(
         self,
-        host: str,
-        port: int,
-        user: str,
-        password: str,
+        bootstrap_servers: str,
         topic: str,
         group: str,
-        cert_path: str,
+        security_protocol: str = "PLAINTEXT",
+        user: str | None = None,
+        password: str | None = None,
+        cert_path: str | None = None,
     ) -> None:
         params = {
-            "bootstrap.servers": f"{host}:{port}",
-            "security.protocol": "SASL_SSL",
-            "ssl.ca.location": cert_path,
-            "sasl.mechanism": "SCRAM-SHA-512",
-            "sasl.username": user,
-            "sasl.password": password,
+            "bootstrap.servers": bootstrap_servers,
+            "security.protocol": security_protocol,
             "group.id": group,
             "auto.offset.reset": "earliest",
             "enable.auto.commit": False,
             "error_cb": error_callback,
             "client.id": "raw-loader",
         }
+
+        if security_protocol == "SASL_SSL":
+            params.update({
+                "ssl.ca.location": cert_path,
+                "sasl.mechanism": "SCRAM-SHA-512",
+                "sasl.username": user,
+                "sasl.password": password,
+            })
 
         self._consumer = Consumer(params)
         self._consumer.subscribe([topic])
