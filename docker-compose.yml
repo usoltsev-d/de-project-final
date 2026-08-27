@@ -146,11 +146,7 @@ services:
     restart: unless-stopped
 
   airflow-init:
-    airflow-webserver:
-      build:
-        context: .
-        dockerfile: Dockerfile.airflow
-      image: de-project-final-airflow
+    image: apache/airflow:2.10.5-python3.12
     container_name: de-airflow-init
 
     environment:
@@ -177,11 +173,7 @@ services:
 
 
   airflow-webserver:
-    airflow-webserver:
-      build:
-        context: .
-        dockerfile: Dockerfile.airflow
-      image: de-project-final-airflow
+    image: apache/airflow:2.10.5-python3.12
     container_name: de-airflow-webserver
 
     ports:
@@ -205,11 +197,7 @@ services:
     restart: unless-stopped
 
   airflow-scheduler:
-    airflow-webserver:
-      build:
-        context: .
-        dockerfile: Dockerfile.airflow
-      image: de-project-final-airflow
+    image: apache/airflow:2.10.5-python3.12
     container_name: de-airflow-scheduler
 
     environment:
