@@ -7,6 +7,7 @@ from stg_loader.stg_processor import StgProcessor
 from stg_loader.stg_repository import StgRepository
 from airflow.hooks.base import BaseHook
 
+
 def main(
     offset_from: int,
     batch_size: int,
