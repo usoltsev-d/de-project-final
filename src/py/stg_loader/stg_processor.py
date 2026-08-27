@@ -10,12 +10,10 @@ class StgProcessor:
         self,
         get_high_watermark: Callable[[], int | None],
         load_batch: Callable[[int, int], None],
-        save_offset: Callable[[int], None],
         logger: logging.Logger,
     ) -> None:
         self._get_high_watermark = get_high_watermark
         self._load_batch = load_batch
-        self._save_offset = save_offset
         self._logger = logger
 
     def run(
@@ -60,9 +58,6 @@ class StgProcessor:
                 last_offset,
                 offset_to,
             )
-
-            # Сохраняем offset только после успешной загрузки batch.
-            self._save_offset(offset_to)
 
             last_offset = offset_to
 
