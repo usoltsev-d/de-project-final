@@ -7,9 +7,6 @@ from stg_loader.stg_processor import StgProcessor
 from stg_loader.stg_repository import StgRepository
 from airflow.hooks.base import BaseHook
 
-conn = BaseHook.get_connection("clickhouse_conn")
-extra = conn.extra_dejson
-
 def main(
     offset_from: int,
     batch_size: int,
@@ -24,6 +21,9 @@ def main(
 
     kafka_topic = os.environ["KAFKA_TOPIC"]
     kafka_partition = 0
+
+    conn = BaseHook.get_connection("clickhouse_conn")
+    extra = conn.extra_dejson
 
     clickhouse = ClickHouseClient(
         host=conn.host,
