@@ -4,7 +4,6 @@ import os
 from datetime import date
 from pathlib import Path
 
-from dotenv import load_dotenv
 
 from cdm_loader.cdm_processor import CdmProcessor
 from cdm_loader.cdm_repository import CdmRepository
@@ -14,7 +13,6 @@ from lib.clickhouse_client import ClickHouseClient
 def main(
     process_date: date,
 ) -> None:
-    load_dotenv()
 
     logging.basicConfig(
         level=logging.INFO,

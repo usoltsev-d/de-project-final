@@ -2,8 +2,6 @@ import logging
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 from lib.clickhouse_client import ClickHouseClient
 from stg_loader.checkpoint import FileCheckpoint
 from stg_loader.stg_processor import StgProcessor
@@ -12,7 +10,6 @@ from stg_loader.stg_repository import StgRepository
 CHECKPOINT_DIR = Path(__file__).resolve().parent / "checkpoints"
 
 def main() -> None:
-    load_dotenv()
 
     logging.basicConfig(
         level=logging.INFO,

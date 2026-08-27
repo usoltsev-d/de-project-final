@@ -1,7 +1,6 @@
 import logging
 import os
 
-from dotenv import load_dotenv
 
 from lib.clickhouse_client import ClickHouseClient
 from lib.kafka_connect import KafkaConsumer
@@ -10,7 +9,6 @@ from raw_loader.raw_repository import RawRepository
 
 
 def main() -> None:
-    load_dotenv()
 
     logging.basicConfig(
         level=logging.INFO,
