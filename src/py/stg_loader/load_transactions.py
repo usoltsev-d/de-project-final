@@ -5,9 +5,15 @@ from pathlib import Path
 from lib.clickhouse_client import ClickHouseClient
 from stg_loader.stg_processor import StgProcessor
 from stg_loader.stg_repository import StgRepository
+from airflow.hooks.base import BaseHook
 
+conn = BaseHook.get_connection("clickhouse_default")
+extra = conn.extra_dejson
 
-def main(last_offset: int) -> int:
+def main(
+    offset_from: int,
+    batch_size: int,
+) -> int:
 
     logging.basicConfig(
         level=logging.INFO,
@@ -20,19 +26,13 @@ def main(last_offset: int) -> int:
     kafka_partition = 0
 
     clickhouse = ClickHouseClient(
-        host=os.environ["CLICKHOUSE_HOST"],
-        port=int(os.environ["CLICKHOUSE_PORT"]),
-        user=os.environ["CLICKHOUSE_USER"],
-        password=os.environ["CLICKHOUSE_PASSWORD"],
-        database=os.environ.get(
-            "CLICKHOUSE_DATABASE",
-            "raw",
-        ),
-        secure=os.environ.get(
-            "CLICKHOUSE_SECURE",
-            "false",
-        ).lower() == "true",
-        cert_path=os.environ.get("CERT_PATH"),
+        host=conn.host,
+        port=conn.port,
+        user=conn.login,
+        password=conn.password,
+        database=conn.schema or "raw",
+        secure=extra.get("secure", False),
+        cert_path=extra.get("cert_path"),
     )
 
     sql_dir = Path("src/sql/dml/stg")
@@ -57,6 +57,9 @@ def main(last_offset: int) -> int:
     )
 
     try:
-        return processor.run(last_offset)
+        return processor.run(
+            offset_from=offset_from,
+            batch_size=batch_size,
+        )
     finally:
         repository.close()
