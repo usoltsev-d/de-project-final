@@ -3,13 +3,11 @@ import os
 from pathlib import Path
 
 from lib.clickhouse_client import ClickHouseClient
-from stg_loader.checkpoint import FileCheckpoint
 from stg_loader.stg_processor import StgProcessor
 from stg_loader.stg_repository import StgRepository
 
-CHECKPOINT_DIR = Path(__file__).resolve().parent / "checkpoints"
 
-def main() -> None:
+def main(last_offset: int) -> int:
 
     logging.basicConfig(
         level=logging.INFO,
@@ -44,12 +42,7 @@ def main() -> None:
         sql_dir=sql_dir,
     )
 
-    checkpoint = FileCheckpoint(
-        CHECKPOINT_DIR / "stg_currencies.offset"
-    )
-
     processor = StgProcessor(
-        checkpoint=checkpoint,
         get_high_watermark=lambda: repository.get_max_raw_offset(
             kafka_topic=kafka_topic,
             kafka_partition=kafka_partition,
@@ -64,10 +57,6 @@ def main() -> None:
     )
 
     try:
-        processor.run()
+        return processor.run(last_offset)
     finally:
         repository.close()
-
-
-if __name__ == "__main__":
-    main()
