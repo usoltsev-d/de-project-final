@@ -1,11 +1,9 @@
 import os
 
 from confluent_kafka import Consumer, TopicPartition
-from dotenv import load_dotenv
 
 
 def main() -> None:
-    load_dotenv()
 
     topic = os.environ["KAFKA_TOPIC"]
     group = os.environ["KAFKA_CONSUMER_GROUP"]

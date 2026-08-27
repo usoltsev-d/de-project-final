@@ -10,7 +10,8 @@ class ClickHouseClient:
         user: str,
         password: str,
         database: str,
-        cert_path: str,
+        secure: bool = False,
+        cert_path: str | None = None,
     ) -> None:
         self._client: Client = clickhouse_connect.get_client(
             host=host,
@@ -18,7 +19,7 @@ class ClickHouseClient:
             username=user,
             password=password,
             database=database,
-            secure=True,
+            secure=secure,
             ca_cert=cert_path,
         )
 
