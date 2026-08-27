@@ -18,25 +18,32 @@ def main() -> None:
     logger = logging.getLogger(__name__)
 
     consumer = KafkaConsumer(
-        host=os.environ["KAFKA_HOST"],
-        port=int(os.environ.get("KAFKA_PORT", "9091")),
-        user=os.environ["KAFKA_USER"],
-        password=os.environ["KAFKA_PASSWORD"],
+        bootstrap_servers=os.environ["KAFKA_BOOTSTRAP_SERVERS"],
         topic=os.environ["KAFKA_TOPIC"],
         group=os.environ["KAFKA_CONSUMER_GROUP"],
-        cert_path=os.environ["CERT_PATH"],
+        security_protocol=os.environ.get(
+            "KAFKA_SECURITY_PROTOCOL",
+            "PLAINTEXT",
+        ),
+        user=os.environ.get("KAFKA_USER"),
+        password=os.environ.get("KAFKA_PASSWORD"),
+        cert_path=os.environ.get("CERT_PATH"),
     )
 
     clickhouse = ClickHouseClient(
         host=os.environ["CLICKHOUSE_HOST"],
-        port=int(os.environ.get("CLICKHOUSE_PORT", "8443")),
+        port=int(os.environ["CLICKHOUSE_PORT"]),
         user=os.environ["CLICKHOUSE_USER"],
         password=os.environ["CLICKHOUSE_PASSWORD"],
         database=os.environ.get(
             "CLICKHOUSE_DATABASE",
             "raw",
         ),
-        cert_path=os.environ["CERT_PATH"],
+        secure=os.environ.get(
+            "CLICKHOUSE_SECURE",
+            "false",
+        ).lower() == "true",
+        cert_path=os.environ.get("CERT_PATH"),
     )
 
     repository = RawRepository(
