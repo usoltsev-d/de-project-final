@@ -1,8 +1,6 @@
 import logging
 from collections.abc import Callable
 
-from stg_loader.checkpoint import FileCheckpoint
-
 
 BATCH_SIZE = 10000
 
@@ -10,23 +8,25 @@ BATCH_SIZE = 10000
 class StgProcessor:
     def __init__(
         self,
-        checkpoint: FileCheckpoint,
         get_high_watermark: Callable[[], int | None],
         load_batch: Callable[[int, int], None],
+        save_offset: Callable[[int], None],
         logger: logging.Logger,
     ) -> None:
-        self._checkpoint = checkpoint
         self._get_high_watermark = get_high_watermark
         self._load_batch = load_batch
+        self._save_offset = save_offset
         self._logger = logger
 
-    def run(self) -> None:
-        last_offset = self._checkpoint.get()
+    def run(
+        self,
+        last_offset: int,
+    ) -> int:
         high_watermark = self._get_high_watermark()
 
         if high_watermark is None:
             self._logger.info("RAW table is empty")
-            return
+            return last_offset
 
         if last_offset >= high_watermark:
             self._logger.info(
@@ -35,7 +35,7 @@ class StgProcessor:
                 last_offset,
                 high_watermark,
             )
-            return
+            return last_offset
 
         self._logger.info(
             "RAW to STG processing started. "
@@ -61,19 +61,21 @@ class StgProcessor:
                 offset_to,
             )
 
-            # Checkpoint двигаем только после успешной записи batch в STG.
-            self._checkpoint.set(offset_to)
+            # Сохраняем offset только после успешной загрузки batch.
+            self._save_offset(offset_to)
 
             last_offset = offset_to
 
             self._logger.info(
                 "Batch processed successfully. "
-                "Checkpoint=%s",
+                "last_offset=%s",
                 last_offset,
             )
 
         self._logger.info(
             "RAW to STG processing completed. "
-            "Checkpoint=%s",
+            "last_offset=%s",
             last_offset,
         )
+
+        return last_offset
