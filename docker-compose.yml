@@ -186,6 +186,7 @@ services:
       PYTHONPATH: /opt/airflow/src/py
 
     volumes:
+      - ./dags:/opt/airflow/dags
       - ./src:/opt/airflow/src
       - airflow_logs:/opt/airflow/logs
 
@@ -212,6 +213,7 @@ services:
       _PIP_ADDITIONAL_REQUIREMENTS: clickhouse-connect
 
     volumes:
+      - ./dags:/opt/airflow/dags
       - ./src:/opt/airflow/src
       - airflow_logs:/opt/airflow/logs
 
