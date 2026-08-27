@@ -20,6 +20,20 @@ services:
     mem_limit: 3g
     restart: unless-stopped
 
+    healthcheck:
+      test:
+        - CMD
+        - clickhouse-client
+        - --user
+        - ${CLICKHOUSE_USER}
+        - --password
+        - ${CLICKHOUSE_PASSWORD}
+        - --query
+        - SELECT 1
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 
   kafka:
     image: apache/kafka:3.9.2
@@ -101,27 +115,14 @@ services:
       - -m
       - raw_loader.load_kafka_events
 
-    depends_on:
-      clickhouse:
-        condition: service_healthy
-      kafka-init:
-        condition: service_completed_successfully
+  depends_on:
+    clickhouse:
+      condition: service_healthy
+    kafka-init:
+      condition: service_completed_successfully
 
     restart: unless-stopped
 
-  healthcheck:
-    test:
-      - CMD
-      - clickhouse-client
-      - --user
-      - ${CLICKHOUSE_USER}
-      - --password
-      - ${CLICKHOUSE_PASSWORD}
-      - --query
-      - SELECT 1
-    interval: 5s
-    timeout: 5s
-    retries: 10
 volumes:
   clickhouse_data:
   kafka_data:
