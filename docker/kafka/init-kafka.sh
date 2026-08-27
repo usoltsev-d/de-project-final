@@ -11,7 +11,7 @@ done
 
 echo "Creating topic $KAFKA_TOPIC..."
 
- /opt/kafka/bin/kafka-topics.sh \
+/opt/kafka/bin/kafka-topics.sh \
   --bootstrap-server kafka:29092 \
   --create \
   --if-not-exists \

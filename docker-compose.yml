@@ -102,11 +102,26 @@ services:
       - raw_loader.load_kafka_events
 
     depends_on:
-      - clickhouse
-      - kafka
+      clickhouse:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
 
     restart: unless-stopped
 
+  healthcheck:
+    test:
+      - CMD
+      - clickhouse-client
+      - --user
+      - ${CLICKHOUSE_USER}
+      - --password
+      - ${CLICKHOUSE_PASSWORD}
+      - --query
+      - SELECT 1
+    interval: 5s
+    timeout: 5s
+    retries: 10
 volumes:
   clickhouse_data:
   kafka_data:
