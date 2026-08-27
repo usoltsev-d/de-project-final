@@ -2,9 +2,6 @@ import logging
 from collections.abc import Callable
 
 
-BATCH_SIZE = 10000
-
-
 class StgProcessor:
     def __init__(
         self,
@@ -18,59 +15,44 @@ class StgProcessor:
 
     def run(
         self,
-        last_offset: int,
+        offset_from: int,
+        batch_size: int,
     ) -> int:
         high_watermark = self._get_high_watermark()
 
         if high_watermark is None:
             self._logger.info("RAW table is empty")
-            return last_offset
+            return offset_from
 
-        if last_offset >= high_watermark:
+        if offset_from >= high_watermark:
             self._logger.info(
                 "No new RAW events. "
-                "last_offset=%s, high_watermark=%s",
-                last_offset,
+                "offset_from=%s, high_watermark=%s",
+                offset_from,
                 high_watermark,
             )
-            return last_offset
+            return offset_from
 
-        self._logger.info(
-            "RAW to STG processing started. "
-            "last_offset=%s, high_watermark=%s",
-            last_offset,
+        offset_to = min(
+            offset_from + batch_size,
             high_watermark,
         )
 
-        while last_offset < high_watermark:
-            offset_to = min(
-                last_offset + BATCH_SIZE,
-                high_watermark,
-            )
-
-            self._logger.info(
-                "Processing RAW offsets (%s, %s]",
-                last_offset,
-                offset_to,
-            )
-
-            self._load_batch(
-                last_offset,
-                offset_to,
-            )
-
-            last_offset = offset_to
-
-            self._logger.info(
-                "Batch processed successfully. "
-                "last_offset=%s",
-                last_offset,
-            )
-
         self._logger.info(
-            "RAW to STG processing completed. "
-            "last_offset=%s",
-            last_offset,
+            "Processing RAW offsets (%s, %s]",
+            offset_from,
+            offset_to,
         )
 
-        return last_offset
+        self._load_batch(
+            offset_from,
+            offset_to,
+        )
+
+        self._logger.info(
+            "Batch processed successfully. "
+            "offset_to=%s",
+            offset_to,
+        )
+
+        return offset_to
