@@ -205,9 +205,11 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      PYTHONPATH: /opt/airflow/src/py
 
+      PYTHONPATH: /opt/airflow/src/py
       KAFKA_TOPIC: ${KAFKA_TOPIC}
+
+      _PIP_ADDITIONAL_REQUIREMENTS: clickhouse-connect
 
     volumes:
       - ./src:/opt/airflow/src
