@@ -3,8 +3,8 @@ from datetime import datetime
 from airflow.decorators import dag, task
 from airflow.models import Variable
 
-from stg_loader.load_currencies import main as load_currencies
-from stg_loader.load_transactions import main as load_transactions
+from stg_loader.load_currencies import load_stg_currencies
+from stg_loader.load_transactions import load_stg_transactions
 
 
 @dag(
@@ -17,7 +17,7 @@ from stg_loader.load_transactions import main as load_transactions
 def raw_to_stg():
 
     @task
-    def load_transactions_task() -> None:
+    def load_stg_transactions_task() -> None:
         offset_from = int(
             Variable.get(
                 "stg_transactions_last_offset",
@@ -32,7 +32,7 @@ def raw_to_stg():
             )
         )
 
-        offset_to = load_transactions(
+        offset_to = load_stg_transactions(
             offset_from=offset_from,
             batch_size=batch_size,
         )
@@ -43,7 +43,7 @@ def raw_to_stg():
         )
 
     @task
-    def load_currencies_task() -> None:
+    def load_stg_currencies_task() -> None:
         offset_from = int(
             Variable.get(
                 "stg_currencies_last_offset",
@@ -58,7 +58,7 @@ def raw_to_stg():
             )
         )
 
-        offset_to = load_currencies(
+        offset_to = load_stg_currencies(
             offset_from=offset_from,
             batch_size=batch_size,
         )

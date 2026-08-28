@@ -12,11 +12,11 @@ class StgRepository:
         self._clickhouse = clickhouse
 
         self._transactions_sql = (
-            sql_dir / "load_transactions.sql"
+            sql_dir / "load_stg_transactions.sql"
         ).read_text(encoding="utf-8")
 
         self._currencies_sql = (
-            sql_dir / "load_currencies.sql"
+            sql_dir / "load_stg_currencies.sql"
         ).read_text(encoding="utf-8")
 
     def get_max_raw_offset(

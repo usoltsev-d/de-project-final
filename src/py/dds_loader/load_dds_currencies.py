@@ -9,7 +9,7 @@ from dds_loader.dds_repository import DdsRepository
 from lib.clickhouse_client import ClickHouseClient
 
 
-def main(
+def load_dds_currencies(
     process_date: date,
 ) -> None:
 

@@ -9,7 +9,7 @@ from dds_loader.dds_repository import DdsRepository
 from lib.clickhouse_client import ClickHouseClient
 
 
-def main(
+def load_dds_transactions(
     process_date: date,
 ) -> None:
 
