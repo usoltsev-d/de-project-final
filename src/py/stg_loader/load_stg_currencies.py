@@ -8,7 +8,7 @@ from stg_loader.stg_repository import StgRepository
 from airflow.hooks.base import BaseHook
 
 
-def main(
+def load_stg_currencies(
     offset_from: int,
     batch_size: int,
 ) -> int:
@@ -48,7 +48,7 @@ def main(
             kafka_topic=kafka_topic,
             kafka_partition=kafka_partition,
         ),
-        load_batch=lambda offset_from, offset_to: repository.load_transactions(
+        load_batch=lambda offset_from, offset_to: repository.load_currencies(
             kafka_topic=kafka_topic,
             kafka_partition=kafka_partition,
             offset_from=offset_from,

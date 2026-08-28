@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS dds.fct_currency_rates
+CREATE TABLE IF NOT EXISTS dds.currencies
 (
     rate_date Date,
     currency_from Int32,
