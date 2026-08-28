@@ -185,6 +185,8 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       PYTHONPATH: /opt/airflow/src/py
 
+      _PIP_ADDITIONAL_REQUIREMENTS: clickhouse-connect
+
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/opt/airflow/src
