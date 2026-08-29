@@ -153,6 +153,7 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
 
     depends_on:
       airflow-postgres:
@@ -171,10 +172,19 @@ services:
           --role Admin \
           --email admin@example.com
 
-        airflow variables set stg_batch_size 100000
-        airflow variables set stg_transactions_last_offset -1
-        airflow variables set stg_currencies_last_offset -1
-        airflow variables set dds_start_date 2022-10-01
+        airflow connections add clickhouse_conn \
+          --conn-type clickhouse \
+          --conn-host clickhouse \
+          --conn-login "${CLICKHOUSE_USER}" \
+          --conn-password "${CLICKHOUSE_PASSWORD}" \
+          --conn-port 8123 \
+          --conn-schema raw \
+          --conn-extra '{"secure": false}' &&
+
+        airflow variables set stg_batch_size 100000 &&
+        airflow variables set stg_transactions_last_offset -1 &&
+        airflow variables set stg_currencies_last_offset -1 &&
+        airflow variables set dds_start_date 2022-10-01 &&
         airflow variables set dds_end_date 2022-11-01
 
 
@@ -189,19 +199,8 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       PYTHONPATH: /opt/airflow/src/py
-      AIRFLOW_CONN_CLICKHOUSE_CONN: >-
-        {
-          "conn_type": "clickhouse",
-          "host": "clickhouse",
-          "login": "${CLICKHOUSE_USER}",
-          "password": "${CLICKHOUSE_PASSWORD}",
-          "schema": "raw",
-          "port": 8123,
-          "extra": {
-            "secure": false
-          }
-        }
 
       _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-clickhousedb==1.0.0
 
@@ -226,22 +225,10 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
 
       PYTHONPATH: /opt/airflow/src/py
       KAFKA_TOPIC: ${KAFKA_TOPIC}
-
-      AIRFLOW_CONN_CLICKHOUSE_CONN: >-
-        {
-          "conn_type": "clickhouse",
-          "host": "clickhouse",
-          "login": "${CLICKHOUSE_USER}",
-          "password": "${CLICKHOUSE_PASSWORD}",
-          "schema": "raw",
-          "port": 8123,
-          "extra": {
-            "secure": false
-          }
-        }
 
       _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-clickhousedb==1.0.0
 
