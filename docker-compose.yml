@@ -146,7 +146,7 @@ services:
     restart: unless-stopped
 
   airflow-init:
-    image: apache/airflow:2.10.5-python3.12
+    image: apache/airflow:2.11.2-python3.12
     container_name: de-airflow-init
 
     environment:
@@ -179,7 +179,7 @@ services:
 
 
   airflow-webserver:
-    image: apache/airflow:2.10.5-python3.12
+    image: apache/airflow:2.11.2-python3.12
     container_name: de-airflow-webserver
 
     ports:
@@ -190,8 +190,20 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       PYTHONPATH: /opt/airflow/src/py
+      AIRFLOW_CONN_CLICKHOUSE_CONN: >-
+        {
+          "conn_type": "clickhouse",
+          "host": "clickhouse",
+          "login": "${CLICKHOUSE_USER}",
+          "password": "${CLICKHOUSE_PASSWORD}",
+          "schema": "raw",
+          "port": 8123,
+          "extra": {
+            "secure": false
+          }
+        }
 
-      _PIP_ADDITIONAL_REQUIREMENTS: clickhouse-connect
+      _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-clickhousedb==1.0.0
 
     volumes:
       - ./dags:/opt/airflow/dags
@@ -207,7 +219,7 @@ services:
     restart: unless-stopped
 
   airflow-scheduler:
-    image: apache/airflow:2.10.5-python3.12
+    image: apache/airflow:2.11.2-python3.12
     container_name: de-airflow-scheduler
 
     environment:
@@ -218,7 +230,20 @@ services:
       PYTHONPATH: /opt/airflow/src/py
       KAFKA_TOPIC: ${KAFKA_TOPIC}
 
-      _PIP_ADDITIONAL_REQUIREMENTS: clickhouse-connect
+      AIRFLOW_CONN_CLICKHOUSE_CONN: >-
+        {
+          "conn_type": "clickhouse",
+          "host": "clickhouse",
+          "login": "${CLICKHOUSE_USER}",
+          "password": "${CLICKHOUSE_PASSWORD}",
+          "schema": "raw",
+          "port": 8123,
+          "extra": {
+            "secure": false
+          }
+        }
+
+      _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-clickhousedb==1.0.0
 
     volumes:
       - ./dags:/opt/airflow/dags
