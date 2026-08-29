@@ -1,11 +1,9 @@
 from datetime import datetime
-
-from datetime import datetime
 from airflow.decorators import dag, task
 from airflow.models import Variable
 
 from dds_loader.load_dds_currencies import load_dds_currencies
-from dds_loader.load_dds_transactions   import load_dds_transactions
+from dds_loader.load_dds_transactions import load_dds_transactions
 
 
 start_date = datetime.fromisoformat(
