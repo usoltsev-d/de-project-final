@@ -39,9 +39,9 @@ def load_dds_currencies(
     )
 
     processor = DdsProcessor(
-        drop_shadow_partition=repository.drop_currency_rates_shadow_partition,
-        load_shadow_partition=repository.load_currency_rates_shadow_partition,
-        replace_partition=repository.replace_currency_rates_partition,
+        drop_shadow_partition=repository.drop_currencies_shadow_partition,
+        load_shadow_partition=repository.load_currencies_shadow_partition,
+        replace_partition=repository.replace_currencies_partition,
     )
 
     try:
