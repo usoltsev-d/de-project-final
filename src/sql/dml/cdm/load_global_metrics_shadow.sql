@@ -26,7 +26,7 @@ WITH transactions_agg AS
             account_number_from,
             account_number_from != -1
         ) AS cnt_accounts_make_transactions
-    FROM dds.fct_transactions
+    FROM dds.transactions
     WHERE transaction_dt >= toDateTime64({process_date:Date}, 3, 'UTC')
     AND transaction_dt <  toDateTime64({process_date:Date} + INTERVAL 1 DAY, 3, 'UTC')
     AND status = 'done' -- Транзакция проведена успешно
@@ -44,7 +44,7 @@ SELECT
         * if(
             t.currency_from = 420,
             1.0,
-            toFloat64(r.currency_rate)
+            toFloat64(c.currency_rate)
         ),
         2
     ) AS amount_total,
@@ -59,7 +59,7 @@ SELECT
     ) AS avg_transactions_per_account,
     t.cnt_accounts_make_transactions
 FROM transactions_agg AS t
-LEFT JOIN dds.fct_currency_rates AS r
-    ON r.rate_date = t.date_update
-    AND r.currency_from = t.currency_from
-    AND r.currency_to = 420; -- Для расчёта amount_total нужны курсы всех валют относительно USD.
+LEFT JOIN dds.currencies AS c
+    ON c.rate_date = t.date_update
+    AND c.currency_from = t.currency_from
+    AND c.currency_to = 420; -- Для расчёта amount_total нужны курсы всех валют относительно USD.

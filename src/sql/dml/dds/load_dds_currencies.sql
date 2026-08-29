@@ -1,4 +1,4 @@
-INSERT INTO dds.fct_currency_rates_shadow
+INSERT INTO dds.currencies_shadow
 (
     rate_date,
     currency_from,
