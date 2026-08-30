@@ -1,9 +1,8 @@
-import argparse
 import logging
-import os
 from datetime import date
 from pathlib import Path
 
+from airflow.hooks.base import BaseHook
 
 from cdm_loader.cdm_processor import CdmProcessor
 from cdm_loader.cdm_repository import CdmRepository
@@ -19,20 +18,17 @@ def main(
         format="%(asctime)s [%(levelname)s] %(message)s",
     )
 
+    conn = BaseHook.get_connection("clickhouse_conn")
+    extra = conn.extra_dejson
+
     clickhouse = ClickHouseClient(
-        host=os.environ["CLICKHOUSE_HOST"],
-        port=int(os.environ["CLICKHOUSE_PORT"]),
-        user=os.environ["CLICKHOUSE_USER"],
-        password=os.environ["CLICKHOUSE_PASSWORD"],
-        database=os.environ.get(
-            "CLICKHOUSE_DATABASE",
-            "cdm",
-        ),
-        secure=os.environ.get(
-            "CLICKHOUSE_SECURE",
-            "false",
-        ).lower() == "true",
-        cert_path=os.environ.get("CERT_PATH"),
+        host=conn.host,
+        port=conn.port,
+        user=conn.login,
+        password=conn.password,
+        database=conn.schema or "cdm",
+        secure=extra.get("secure", False),
+        cert_path=extra.get("cert_path"),
     )
 
     sql_dir = Path("src/sql/dml/cdm")
@@ -53,17 +49,3 @@ def main(
         processor.run(process_date)
     finally:
         repository.close()
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--process-date",
-        required=True,
-        type=date.fromisoformat,
-    )
-
-    args = parser.parse_args()
-
-    main(args.process_date)

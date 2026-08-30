@@ -63,4 +63,4 @@ FROM transactions_agg AS t
 LEFT JOIN dds.currencies AS c
    ON c.rate_date = t.date_update
    AND c.currency_from = t.currency_from
-   AND c.currency_to = 420; - Для расчёта amount_total нужны курсы всех валют относительно USD.
+   AND c.currency_to = 420; -- Для расчёта amount_total нужны курсы всех валют относительно USD.
