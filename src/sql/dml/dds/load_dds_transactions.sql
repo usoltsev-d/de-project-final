@@ -23,4 +23,4 @@ SELECT DISTINCT
 FROM stg.transactions
 WHERE transaction_dt >= toDateTime64({process_date:Date}, 3, 'UTC')
 AND transaction_dt <  toDateTime64({process_date:Date} + INTERVAL 1 DAY, 3, 'UTC')
-AND account_number_from < 0; -- Очистка от тестовых аккаунтов
+AND account_number_from > 0; -- Очистка от тестовых аккаунтов

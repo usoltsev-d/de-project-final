@@ -13,8 +13,28 @@ class CdmRepository:
         self._clickhouse = clickhouse
 
         self._global_metrics_sql = (
-            sql_dir / "load_global_metrics_shadow.sql"
+            sql_dir / "load_cdm_global_metrics.sql"
         ).read_text(encoding="utf-8")
+
+        self._check_missing_usd_rates_sql = (
+            sql_dir / "check_missing_usd_rates.sql"
+        ).read_text(encoding="utf-8")
+
+    def get_missing_usd_rates(
+        self,
+        process_date: date,
+    ) -> list[int]:
+        result = self._clickhouse.client.query(
+            self._check_missing_usd_rates_sql,
+            parameters={
+                "process_date": process_date,
+            },
+        )
+
+        return [
+            row[0]
+            for row in result.result_rows
+        ]
 
     def drop_global_metrics_shadow_partition(
         self,
