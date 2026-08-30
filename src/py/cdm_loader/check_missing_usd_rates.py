@@ -8,7 +8,7 @@ from cdm_loader.cdm_repository import CdmRepository
 from lib.clickhouse_client import ClickHouseClient
 
 
-def check_cdm_usd_rates(
+def check_missing_usd_rates(
     process_date: date,
 ) -> None:
 
