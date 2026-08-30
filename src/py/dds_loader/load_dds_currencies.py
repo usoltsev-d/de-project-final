@@ -46,5 +46,9 @@ def load_dds_currencies(
 
     try:
         processor.run(process_date)
+        logging.info(
+            "DDS currencies processed for date=%s",
+            process_date,
+        )
     finally:
         repository.close()
