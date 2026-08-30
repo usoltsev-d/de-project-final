@@ -46,5 +46,9 @@ def load_dds_transactions(
 
     try:
         processor.run(process_date)
+        logging.info(
+            "DDS transactions processed for date=%s",
+            process_date,
+        )
     finally:
         repository.close()
