@@ -31,7 +31,7 @@ def load_dds_currencies(
         cert_path=extra.get("cert_path"),
     )
 
-    sql_dir = Path("src/sql/dml/dds")
+    sql_dir = Path("src/sql/scripts/dds")
 
     repository = DdsRepository(
         clickhouse=clickhouse,

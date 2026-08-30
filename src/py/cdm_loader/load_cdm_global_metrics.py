@@ -9,7 +9,7 @@ from cdm_loader.cdm_repository import CdmRepository
 from lib.clickhouse_client import ClickHouseClient
 
 
-def main(
+def load_cdm_global_metrics(
     process_date: date,
 ) -> None:
 
@@ -31,7 +31,7 @@ def main(
         cert_path=extra.get("cert_path"),
     )
 
-    sql_dir = Path("src/sql/dml/cdm")
+    sql_dir = Path("src/sql/scripts/cdm")
 
     repository = CdmRepository(
         clickhouse=clickhouse,
@@ -47,5 +47,9 @@ def main(
 
     try:
         processor.run(process_date)
+        logging.info(
+            "CDM global_metrics processed for date=%s",
+            process_date,
+        )
     finally:
         repository.close()

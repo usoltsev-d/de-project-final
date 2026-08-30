@@ -189,7 +189,9 @@ services:
         airflow variables set stg_transactions_last_offset -1 &&
         airflow variables set stg_currencies_last_offset -1 &&
         airflow variables set dds_start_date 2022-10-01 &&
-        airflow variables set dds_end_date 2022-11-01
+        airflow variables set dds_end_date 2022-11-01 &&
+        airflow variables set cdm_start_date 2022-10-01 &&
+        airflow variables set cdm_end_date 2022-11-01
 
 
   airflow-webserver:
