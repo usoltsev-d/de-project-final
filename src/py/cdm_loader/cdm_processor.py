@@ -24,7 +24,7 @@ class CdmProcessor:
         if missing_rates:
             raise ValueError(
                 f"Missing USD rates for date={process_date}: "
-                f"{missing_rates}"
+                f"currency_from={missing_rates}"
             )
 
         self._drop_shadow_partition(process_date)
