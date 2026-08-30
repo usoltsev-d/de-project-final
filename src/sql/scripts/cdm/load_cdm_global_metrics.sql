@@ -30,6 +30,25 @@ WITH transactions_agg AS
     GROUP BY
         date_update,
         currency_from
+),
+rates_to_usd AS
+(
+    -- Прямые курсы валют в USD
+    SELECT DISTINCT
+        rate_date,
+        currency_from,
+        toFloat64(currency_rate) AS currency_rate
+    FROM dds.currencies
+    WHERE rate_date = {process_date:Date}
+      AND currency_to = 420
+
+    UNION ALL
+
+    -- USD в USD всегда имеет коэффициент 1
+    SELECT
+        {process_date:Date} AS rate_date,
+        420 AS currency_from,
+        1.0 AS currency_rate
 )
 
 SELECT
@@ -38,12 +57,7 @@ SELECT
 
      -- Общий денежный оборот компании в USD
     round(
-        t.amount_in_currency
-        * if(
-            t.currency_from = 420,
-            1.0, -- Для USD дополнительный пересчёт не требуется
-            toFloat64(c.currency_rate)
-        ),
+        t.amount_in_currency * r.currency_rate,
         2
     ) AS amount_total,
 
@@ -60,7 +74,6 @@ SELECT
     --  Количество уникальных аккаунтов с совершёнными транзакциями по валюте
     t.cnt_accounts_make_transactions
 FROM transactions_agg AS t
-LEFT JOIN dds.currencies AS c
-   ON c.rate_date = t.date_update
-   AND c.currency_from = t.currency_from
-   AND c.currency_to = 420; -- Для расчёта amount_total нужны курсы всех валют относительно USD.
+INNER JOIN rates_to_usd AS r
+    ON r.rate_date = t.date_update
+   AND r.currency_from = t.currency_from;
