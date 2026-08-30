@@ -26,10 +26,12 @@ class StgRepository:
     ) -> int | None:
         result = self._clickhouse.client.query(
             """
-            SELECT maxOrNull(kafka_offset)
+            SELECT kafka_offset
             FROM raw.kafka_events
             WHERE kafka_topic = {kafka_topic:String}
             AND kafka_partition = {kafka_partition:UInt16}
+            ORDER BY kafka_offset DESC
+            LIMIT 1
             """,
             parameters={
                 "kafka_topic": kafka_topic,
