@@ -4,6 +4,7 @@ from airflow.decorators import dag, task
 from airflow.models import Variable
 from airflow.sensors.external_task import ExternalTaskSensor
 
+from cdm_loader.check_missing_usd_rates import check_missing_usd_rates
 from cdm_loader.load_cdm_global_metrics import load_cdm_global_metrics
 
 
@@ -52,9 +53,19 @@ def dds_to_cdm():
             ).date()
         )
 
+    @task
+    def check_missing_usd_rates_task(
+        process_date: str,
+    ) -> None:
+        check_missing_usd_rates(
+            process_date=datetime.fromisoformat(
+                process_date
+            ).date()
+        )
+
     process_date = "{{ data_interval_start | ds }}"
 
-    wait_for_dds >> load_global_metrics_task(process_date)
+    wait_for_dds >> load_global_metrics_task(process_date) >> check_missing_usd_rates_task(process_date)
 
 
 dds_to_cdm()
