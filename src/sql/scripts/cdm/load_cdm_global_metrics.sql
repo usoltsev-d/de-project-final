@@ -31,6 +31,7 @@ WITH transactions_agg AS
         date_update,
         currency_from
 ),
+-- Подготавливаем курсы для пересчёта суммы транзакций в USD.
 rates_to_usd AS
 (
     -- Прямые курсы валют в USD
@@ -40,7 +41,7 @@ rates_to_usd AS
         toFloat64(currency_rate) AS currency_rate
     FROM dds.currencies
     WHERE rate_date = {process_date:Date}
-      AND currency_to = 420
+    AND currency_to = 420
 
     UNION ALL
 
