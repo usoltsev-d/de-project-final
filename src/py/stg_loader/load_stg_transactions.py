@@ -36,7 +36,7 @@ def load_stg_transactions(
         cert_path=extra.get("cert_path"),
     )
 
-    sql_dir = Path("src/sql/dml/stg")
+    sql_dir = Path("src/sql/scripts/stg")
 
     repository = StgRepository(
         clickhouse=clickhouse,
