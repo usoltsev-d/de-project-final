@@ -43,6 +43,7 @@ def main(
     )
 
     processor = CdmProcessor(
+        get_missing_usd_rates=repository.get_missing_usd_rates,
         drop_shadow_partition=repository.drop_global_metrics_shadow_partition,
         load_shadow_partition=repository.load_global_metrics_shadow_partition,
         replace_partition=repository.replace_global_metrics_partition,
