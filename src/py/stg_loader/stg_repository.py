@@ -39,6 +39,9 @@ class StgRepository:
             },
         )
 
+        if not result.result_rows:
+            return None
+
         return result.first_row[0]
 
     def load_transactions(
