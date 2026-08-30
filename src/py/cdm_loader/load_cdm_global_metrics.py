@@ -46,6 +46,18 @@ def load_cdm_global_metrics(
 
     try:
         processor.run(process_date)
+
+        # Проверяем, что для всех валют с успешными транзакциями доступны прямые курсы пересчёта в USD.
+        missing_rates = repository.get_missing_usd_rates(
+            process_date
+        )
+
+        if missing_rates:
+            raise ValueError(
+                f"Missing USD rates for date={process_date}: "
+                f"currency_from={missing_rates}"
+            )
+
         logging.info(
             "CDM global_metrics processed for date=%s",
             process_date,
