@@ -41,7 +41,7 @@ def stg_to_dds():
             "process_date": process_date,
         },
         mode="reschedule",
-        poke_interval=300,
+        poke_interval=30,
         timeout=21600,
     )
 
@@ -105,5 +105,6 @@ def stg_to_dds():
 
     transactions >> transactions_check
     currencies >> currencies_check
+
 
 stg_to_dds()
