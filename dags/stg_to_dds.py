@@ -7,7 +7,7 @@ from dds_loader.load_dds_currencies import load_dds_currencies
 from dds_loader.load_dds_transactions import load_dds_transactions
 from dds_loader.check_transactions_exist import check_transactions_exist
 from dds_loader.check_currencies_exist import check_currencies_exist
-from stg_loader.check_stg_ready import is_stg_date_ready
+from dds_loader.check_stg_ready import is_stg_date_ready
 
 
 start_date = datetime.fromisoformat(
@@ -105,3 +105,5 @@ def stg_to_dds():
 
     transactions >> transactions_check
     currencies >> currencies_check
+
+stg_to_dds()

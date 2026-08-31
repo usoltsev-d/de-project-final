@@ -57,7 +57,7 @@ def is_stg_date_ready(
 
         ready = (
             latest_transaction_date > process_date_value
-            and latest_currency_date >= process_date_value
+            and latest_currency_date > process_date_value
         )
 
         logging.info(
