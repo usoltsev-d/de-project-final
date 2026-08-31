@@ -3,7 +3,6 @@ from datetime import date
 from pathlib import Path
 
 from airflow.hooks.base import BaseHook
-from airflow.exceptions import AirflowSkipException
 
 from dds_loader.dds_repository import DdsRepository
 from lib.clickhouse_client import ClickHouseClient
@@ -33,7 +32,7 @@ def check_transactions_exist(
 
     try:
         if not repository.has_transactions(process_date):
-            raise AirflowSkipException(
+            raise ValueError(
                 f"No transactions for date={process_date}"
             )
 
