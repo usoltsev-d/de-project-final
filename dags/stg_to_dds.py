@@ -2,6 +2,7 @@ from datetime import datetime
 from airflow.decorators import dag, task
 from airflow.models import Variable
 from airflow.sensors.python import PythonSensor
+from airflow.operators.empty import EmptyOperator
 
 from dds_loader.load_dds_currencies import load_dds_currencies
 from dds_loader.load_dds_transactions import load_dds_transactions
@@ -85,6 +86,10 @@ def stg_to_dds():
             ).date()
     )
 
+    dds_ready_for_cdm = EmptyOperator(
+        task_id="dds_ready_for_cdm",
+    )
+
     transactions = load_dds_transactions_task(
         process_date
     )
@@ -105,6 +110,8 @@ def stg_to_dds():
 
     transactions >> transactions_check
     currencies >> currencies_check
+
+    [transactions_check, currencies_check] >> dds_ready_for_cdm
 
 
 stg_to_dds()
