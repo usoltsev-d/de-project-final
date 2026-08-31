@@ -36,13 +36,12 @@ def dds_to_cdm():
     wait_for_dds = ExternalTaskSensor(
         task_id="wait_for_dds",
         external_dag_id="stg_to_dds",
-        external_task_id="dds_ready_for_cdm",
-        allowed_states=["success"],
-        skipped_states=["skipped"],
-        failed_states=[
-            "failed",
-            "upstream_failed",
+        external_task_ids=[
+            "load_dds_transactions_task",
+            "load_dds_currencies_task",
         ],
+        allowed_states=["success"],
+        failed_states=["failed"],
         mode="reschedule",
         poke_interval=30,
         timeout=3600,
