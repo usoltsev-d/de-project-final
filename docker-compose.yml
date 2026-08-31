@@ -208,6 +208,8 @@ services:
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       PYTHONPATH: /opt/airflow/src/py
 
+      AIRFLOW__WEBSERVER__DEFAULT_DAG_RUN_DISPLAY_NUMBER: 31
+
       _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-clickhousedb==1.0.0
 
     volumes:

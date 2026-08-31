@@ -114,5 +114,50 @@ class DdsRepository:
     ) -> int:
         return int(process_date.strftime("%Y%m%d"))
 
+    def has_transactions(
+        self,
+        process_date: date,
+    ) -> bool:
+        result = self._clickhouse.client.query(
+            """
+            SELECT 1
+            FROM dds.transactions
+            WHERE transaction_dt >= toDateTime64(
+                {process_date:Date},
+                3,
+                'UTC'
+            )
+            AND transaction_dt < toDateTime64(
+                {process_date:Date} + INTERVAL 1 DAY,
+                3,
+                'UTC'
+            )
+            LIMIT 1
+            """,
+            parameters={
+                "process_date": process_date,
+            },
+        )
+
+        return bool(result.result_rows)
+
+    def has_currencies(
+        self,
+        process_date: date,
+    ) -> bool:
+        result = self._clickhouse.client.query(
+            """
+            SELECT 1
+            FROM dds.currencies
+            WHERE rate_date = {process_date:Date}
+            LIMIT 1
+            """,
+            parameters={
+                "process_date": process_date,
+            },
+        )
+
+        return bool(result.result_rows)
+
     def close(self) -> None:
         self._clickhouse.close()

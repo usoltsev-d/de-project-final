@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 
 from lib.clickhouse_client import ClickHouseClient
@@ -37,6 +38,37 @@ class StgRepository:
                 "kafka_topic": kafka_topic,
                 "kafka_partition": kafka_partition,
             },
+        )
+
+        if not result.result_rows:
+            return None
+
+        return result.first_row[0]
+
+    def get_latest_transaction_date(self) -> date | None:
+        result = self._clickhouse.client.query(
+            """
+            SELECT toDate(transaction_dt)
+            FROM stg.transactions
+            ORDER BY transaction_dt DESC
+            LIMIT 1
+            """
+        )
+
+        if not result.result_rows:
+            return None
+
+        return result.first_row[0]
+
+
+    def get_latest_currency_date(self) -> date | None:
+        result = self._clickhouse.client.query(
+            """
+            SELECT toDate(date_update)
+            FROM stg.currencies
+            ORDER BY date_update DESC
+            LIMIT 1
+            """
         )
 
         if not result.result_rows:
