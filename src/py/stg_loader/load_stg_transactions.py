@@ -29,11 +29,11 @@ def load_stg_transactions(
     client = clickhouse_connect.get_client(
         host=conn.host,
         port=conn.port,
-        user=conn.login,
+        username=conn.login,
         password=conn.password,
         database=conn.schema or "raw",
         secure=extra.get("secure", False),
-        cert_path=extra.get("cert_path"),
+        ca_cert=extra.get("cert_path"),
     )
 
     sql_dir = Path("src/sql/scripts/stg")
