@@ -6,7 +6,6 @@ from pathlib import Path
 from airflow.hooks.base import BaseHook
 
 from cdm_loader.cdm_repository import CdmRepository
-from lib.clickhouse_client import ClickHouseClient
 
 
 def check_missing_usd_rates(
