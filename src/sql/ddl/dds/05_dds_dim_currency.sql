@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS dds.dim_currency
 (
     currency_code Int32,
     country LowCardinality(String),
+    currency_iso_code LowCardinality(String),
     load_dttm DateTime64(3, 'UTC') DEFAULT now64(3)
 )
 ENGINE = MergeTree
