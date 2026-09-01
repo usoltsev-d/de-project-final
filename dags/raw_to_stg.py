@@ -37,10 +37,11 @@ def raw_to_stg():
             batch_size=batch_size,
         )
 
-        Variable.set(
-            "stg_transactions_last_offset",
-            offset_to,
-        )
+        if offset_to > offset_from:
+            Variable.set(
+                "stg_transactions_last_offset",
+                offset_to,
+            )
 
     @task
     def load_stg_currencies_task() -> None:
@@ -63,10 +64,11 @@ def raw_to_stg():
             batch_size=batch_size,
         )
 
-        Variable.set(
-            "stg_currencies_last_offset",
-            offset_to,
-        )
+        if offset_to > offset_from:
+            Variable.set(
+                "stg_currencies_last_offset",
+                offset_to,
+            )
 
     load_stg_transactions_task()
     load_stg_currencies_task()
