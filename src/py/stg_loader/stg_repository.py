@@ -7,7 +7,7 @@ class StgRepository:
         client,
         sql_dir: Path,
     ) -> None:
-        self._clickhouse = client
+        self._client = client
 
         self._transactions_sql = (
             sql_dir / "load_stg_transactions.sql"

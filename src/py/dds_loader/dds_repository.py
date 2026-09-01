@@ -1,16 +1,14 @@
 from datetime import date
 from pathlib import Path
 
-from lib.clickhouse_client import ClickHouseClient
-
 
 class DdsRepository:
     def __init__(
         self,
-        clickhouse: ClickHouseClient,
+        client,
         sql_dir: Path,
     ) -> None:
-        self._clickhouse = clickhouse
+        self._client = client
 
         self._transactions_sql = (
             sql_dir / "load_dds_transactions.sql"
@@ -26,7 +24,7 @@ class DdsRepository:
     ) -> None:
         partition_id = self._get_partition_id(process_date)
 
-        self._clickhouse.client.command(
+        self._client.command(
             """
             ALTER TABLE dds.transactions_shadow
             DROP PARTITION {partition_id:UInt32}
@@ -40,7 +38,7 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
-        self._clickhouse.client.command(
+        self._client.command(
             self._transactions_sql,
             parameters={
                 "process_date": process_date,
@@ -53,7 +51,7 @@ class DdsRepository:
     ) -> None:
         partition_id = self._get_partition_id(process_date)
 
-        self._clickhouse.client.command(
+        self._client.command(
             """
             ALTER TABLE dds.transactions
             REPLACE PARTITION {partition_id:UInt32}
@@ -70,7 +68,7 @@ class DdsRepository:
     ) -> None:
         partition_id = self._get_partition_id(process_date)
 
-        self._clickhouse.client.command(
+        self._client.command(
             """
             ALTER TABLE dds.currencies_shadow
             DROP PARTITION {partition_id:UInt32}
@@ -84,7 +82,7 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> None:
-        self._clickhouse.client.command(
+        self._client.command(
             self._currencies_sql,
             parameters={
                 "process_date": process_date,
@@ -97,7 +95,7 @@ class DdsRepository:
     ) -> None:
         partition_id = self._get_partition_id(process_date)
 
-        self._clickhouse.client.command(
+        self._client.command(
             """
             ALTER TABLE dds.currencies
             REPLACE PARTITION {partition_id:UInt32}
@@ -118,7 +116,7 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> bool:
-        result = self._clickhouse.client.query(
+        result = self._client.query(
             """
             SELECT 1
             FROM dds.transactions
@@ -145,7 +143,7 @@ class DdsRepository:
         self,
         process_date: date,
     ) -> bool:
-        result = self._clickhouse.client.query(
+        result = self._client.query(
             """
             SELECT 1
             FROM dds.currencies
@@ -160,4 +158,4 @@ class DdsRepository:
         return bool(result.result_rows)
 
     def close(self) -> None:
-        self._clickhouse.close()
+        self._client.close()
