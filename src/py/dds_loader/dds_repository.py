@@ -18,6 +18,10 @@ class DdsRepository:
             sql_dir / "load_dds_currencies.sql"
         ).read_text(encoding="utf-8")
 
+        self._dim_currency_sql = (
+            sql_dir / "load_dds_dim_currency.sql"
+        ).read_text(encoding="utf-8")
+
     def drop_transactions_shadow_partition(
         self,
         process_date: date,
@@ -156,6 +160,17 @@ class DdsRepository:
         )
 
         return bool(result.result_rows)
+
+    def load_dim_currency(
+        self,
+        process_date: date,
+    ) -> None:
+        self._client.command(
+            self._dim_currency_sql,
+            parameters={
+                "process_date": process_date,
+            },
+        )
 
     def close(self) -> None:
         self._client.close()
