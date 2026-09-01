@@ -1,8 +1,7 @@
 import logging
 import os
+import clickhouse_connect
 
-
-from lib.clickhouse_client import ClickHouseClient
 from lib.kafka_connect import KafkaConsumer
 from raw_loader.raw_processor import RawProcessor
 from raw_loader.raw_repository import RawRepository
@@ -30,10 +29,10 @@ def main() -> None:
         cert_path=os.environ.get("CERT_PATH"),
     )
 
-    clickhouse = ClickHouseClient(
+    client = clickhouse_connect.get_client(
         host=os.environ["CLICKHOUSE_HOST"],
         port=int(os.environ["CLICKHOUSE_PORT"]),
-        user=os.environ["CLICKHOUSE_USER"],
+        username=os.environ["CLICKHOUSE_USER"],
         password=os.environ["CLICKHOUSE_PASSWORD"],
         database=os.environ.get(
             "CLICKHOUSE_DATABASE",
@@ -43,11 +42,11 @@ def main() -> None:
             "CLICKHOUSE_SECURE",
             "false",
         ).lower() == "true",
-        cert_path=os.environ.get("CERT_PATH"),
+        ca_cert=os.environ.get("CERT_PATH"),
     )
 
     repository = RawRepository(
-        clickhouse=clickhouse,
+        client=client,
     )
 
     processor = RawProcessor(
