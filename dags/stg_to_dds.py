@@ -5,6 +5,7 @@ from airflow.sensors.python import PythonSensor
 
 from dds_loader.load_dds_currencies import load_dds_currencies
 from dds_loader.load_dds_transactions import load_dds_transactions
+from dds_loader.load_dds_dim_currency import load_dds_dim_currency
 from dds_loader.check_transactions_exist import check_transactions_exist
 from dds_loader.check_currencies_exist import check_currencies_exist
 from dds_loader.check_stg_ready import is_stg_date_ready
@@ -66,6 +67,16 @@ def stg_to_dds():
         )
 
     @task
+    def load_dds_dim_currency_task(
+        process_date: str,
+    ) -> None:
+        load_dds_dim_currency(
+            process_date=datetime.fromisoformat(
+                process_date
+            ).date()
+        )
+
+    @task
     def check_transactions_exist_task(
         process_date: str,
     ) -> None:
@@ -93,6 +104,10 @@ def stg_to_dds():
         process_date
     )
 
+    dim_currency = load_dds_dim_currency_task(
+        process_date
+    )
+
     transactions_check = check_transactions_exist_task(
         process_date
     )
@@ -103,7 +118,7 @@ def stg_to_dds():
 
     wait_for_stg_date >> [transactions, currencies]
 
-    transactions >> transactions_check
+    transactions >> [transactions_check, dim_currency]
     currencies >> currencies_check
 
 
