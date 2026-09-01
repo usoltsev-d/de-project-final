@@ -1,8 +1,7 @@
 import logging
 import os
-from pathlib import Path
-
 import clickhouse_connect
+from pathlib import Path
 
 from stg_loader.stg_processor import StgProcessor
 from stg_loader.stg_repository import StgRepository

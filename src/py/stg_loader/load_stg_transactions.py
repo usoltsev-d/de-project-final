@@ -1,8 +1,8 @@
 import logging
 import os
+import clickhouse_connect
 from pathlib import Path
 
-import clickhouse_connect
 from stg_loader.stg_processor import StgProcessor
 from stg_loader.stg_repository import StgRepository
 from airflow.hooks.base import BaseHook
