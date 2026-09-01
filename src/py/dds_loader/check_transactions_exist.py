@@ -25,7 +25,7 @@ def check_transactions_exist(
         ca_cert=extra.get("cert_path"),
     )
 
-    sql_dir = Path("src/sql/scripts/stg")
+    sql_dir = Path("src/sql/scripts/dds")
 
     repository = DdsRepository(
         client=client,
