@@ -1,14 +1,11 @@
 from typing import Sequence
 
-from lib.clickhouse_client import ClickHouseClient
-
-
 class RawRepository:
     def __init__(
         self,
-        clickhouse: ClickHouseClient,
+        client,
     ) -> None:
-        self._clickhouse = clickhouse
+        self._client = client
 
     def save_events(
         self,
@@ -49,7 +46,7 @@ class RawRepository:
         if not new_events:
             return 0
 
-        self._clickhouse.client.insert(
+        self._client.insert(
             "raw.kafka_events",
             new_events,
             column_names=[
@@ -69,7 +66,7 @@ class RawRepository:
         offset_from: int,
         offset_to: int,
     ) -> set[int]:
-        result = self._clickhouse.client.query(
+        result = self._client.query(
             """
             SELECT kafka_offset
             FROM raw.kafka_events
@@ -92,4 +89,4 @@ class RawRepository:
         }
 
     def close(self) -> None:
-        self._clickhouse.close()
+        self._client.close()
