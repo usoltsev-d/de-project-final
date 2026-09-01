@@ -1,4 +1,5 @@
 import logging
+import clickhouse_connect
 from datetime import date
 from pathlib import Path
 
@@ -6,7 +7,6 @@ from airflow.hooks.base import BaseHook
 
 from dds_loader.dds_processor import DdsProcessor
 from dds_loader.dds_repository import DdsRepository
-from lib.clickhouse_client import ClickHouseClient
 
 
 def load_dds_currencies(
@@ -21,20 +21,20 @@ def load_dds_currencies(
     conn = BaseHook.get_connection("clickhouse_conn")
     extra = conn.extra_dejson
 
-    clickhouse = ClickHouseClient(
+    client = clickhouse_connect.get_client(
         host=conn.host,
         port=conn.port,
-        user=conn.login,
+        username=conn.login,
         password=conn.password,
         database=conn.schema or "dds",
         secure=extra.get("secure", False),
-        cert_path=extra.get("cert_path"),
+        ca_cert=extra.get("cert_path"),
     )
 
     sql_dir = Path("src/sql/scripts/dds")
 
     repository = DdsRepository(
-        clickhouse=clickhouse,
+        client=client,
         sql_dir=sql_dir,
     )
 
