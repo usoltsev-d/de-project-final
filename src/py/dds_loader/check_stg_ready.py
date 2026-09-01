@@ -1,10 +1,10 @@
 import logging
+import clickhouse_connect
 from datetime import datetime
 from pathlib import Path
 
 from airflow.hooks.base import BaseHook
 
-from lib.clickhouse_client import ClickHouseClient
 from stg_loader.stg_repository import StgRepository
 
 
@@ -18,19 +18,21 @@ def is_stg_date_ready(
     conn = BaseHook.get_connection("clickhouse_conn")
     extra = conn.extra_dejson
 
-    clickhouse = ClickHouseClient(
+    client = clickhouse_connect.get_client(
         host=conn.host,
         port=conn.port,
-        user=conn.login,
+        username=conn.login,
         password=conn.password,
         database=conn.schema or "raw",
         secure=extra.get("secure", False),
-        cert_path=extra.get("cert_path"),
+        ca_cert=extra.get("cert_path"),
     )
 
+    sql_dir = Path("src/sql/scripts/stg")
+
     repository = StgRepository(
-        clickhouse=clickhouse,
-        sql_dir=Path("src/sql/scripts/stg"),
+        client=client,
+        sql_dir=sql_dir,
     )
 
     try:
