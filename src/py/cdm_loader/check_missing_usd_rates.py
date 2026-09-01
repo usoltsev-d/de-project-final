@@ -1,4 +1,5 @@
 import logging
+import clickhouse_connect
 from datetime import date
 from pathlib import Path
 
@@ -15,20 +16,20 @@ def check_missing_usd_rates(
     conn = BaseHook.get_connection("clickhouse_conn")
     extra = conn.extra_dejson
 
-    clickhouse = ClickHouseClient(
+    client = clickhouse_connect.get_client(
         host=conn.host,
         port=conn.port,
-        user=conn.login,
+        username=conn.login,
         password=conn.password,
         database=conn.schema or "cdm",
         secure=extra.get("secure", False),
-        cert_path=extra.get("cert_path"),
+        ca_cert=extra.get("cert_path"),
     )
 
     sql_dir = Path("src/sql/scripts/cdm")
 
     repository = CdmRepository(
-        clickhouse=clickhouse,
+        client=client,
         sql_dir=sql_dir,
     )
 
