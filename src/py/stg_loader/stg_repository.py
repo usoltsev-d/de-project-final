@@ -1,16 +1,13 @@
 from datetime import date
 from pathlib import Path
 
-from lib.clickhouse_client import ClickHouseClient
-
-
 class StgRepository:
     def __init__(
         self,
-        clickhouse: ClickHouseClient,
+        client,
         sql_dir: Path,
     ) -> None:
-        self._clickhouse = clickhouse
+        self._clickhouse = client
 
         self._transactions_sql = (
             sql_dir / "load_stg_transactions.sql"
@@ -25,7 +22,7 @@ class StgRepository:
         kafka_topic: str,
         kafka_partition: int,
     ) -> int | None:
-        result = self._clickhouse.client.query(
+        result = self._client.query(
             """
             SELECT kafka_offset
             FROM raw.kafka_events
@@ -46,7 +43,7 @@ class StgRepository:
         return result.first_row[0]
 
     def get_latest_transaction_date(self) -> date | None:
-        result = self._clickhouse.client.query(
+        result = self._client.query(
             """
             SELECT toDate(transaction_dt)
             FROM stg.transactions
@@ -62,7 +59,7 @@ class StgRepository:
 
 
     def get_latest_currency_date(self) -> date | None:
-        result = self._clickhouse.client.query(
+        result = self._client.query(
             """
             SELECT toDate(date_update)
             FROM stg.currencies
@@ -83,7 +80,7 @@ class StgRepository:
         offset_from: int,
         offset_to: int,
     ) -> None:
-        self._clickhouse.client.command(
+        self._client.command(
             self._transactions_sql,
             parameters={
                 "kafka_topic": kafka_topic,
@@ -100,7 +97,7 @@ class StgRepository:
         offset_from: int,
         offset_to: int,
     ) -> None:
-        self._clickhouse.client.command(
+        self._client.command(
             self._currencies_sql,
             parameters={
                 "kafka_topic": kafka_topic,
@@ -111,4 +108,4 @@ class StgRepository:
         )
 
     def close(self) -> None:
-        self._clickhouse.close()
+        self._client.close()
