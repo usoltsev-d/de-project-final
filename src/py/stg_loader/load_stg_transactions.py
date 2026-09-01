@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 
-from lib.clickhouse_client import ClickHouseClient
+import clickhouse_connect
 from stg_loader.stg_processor import StgProcessor
 from stg_loader.stg_repository import StgRepository
 from airflow.hooks.base import BaseHook
@@ -26,7 +26,7 @@ def load_stg_transactions(
     conn = BaseHook.get_connection("clickhouse_conn")
     extra = conn.extra_dejson
 
-    clickhouse = ClickHouseClient(
+    client = clickhouse_connect.get_client(
         host=conn.host,
         port=conn.port,
         user=conn.login,
@@ -39,7 +39,7 @@ def load_stg_transactions(
     sql_dir = Path("src/sql/scripts/stg")
 
     repository = StgRepository(
-        clickhouse=clickhouse,
+        client=client,
         sql_dir=sql_dir,
     )
 
