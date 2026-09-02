@@ -17,7 +17,8 @@ def main() -> None:
     logger = logging.getLogger(__name__)
 
     consumer = KafkaConsumer(
-        bootstrap_servers=os.environ["KAFKA_BOOTSTRAP_SERVERS"],
+        host=os.environ["KAFKA_HOST"],
+        port=int(os.environ["KAFKA_PORT"]),
         topic=os.environ["KAFKA_TOPIC"],
         group=os.environ["KAFKA_CONSUMER_GROUP"],
         security_protocol=os.environ.get(
