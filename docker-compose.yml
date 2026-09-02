@@ -14,7 +14,7 @@ services:
 
     volumes:
       - clickhouse_data:/var/lib/clickhouse
-      - ./src/sql/ddl:/app/sql/ddl:ro
+      - ./src/sql:/app/sql:ro
       - ./docker/clickhouse/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
 
     mem_limit: 3g
