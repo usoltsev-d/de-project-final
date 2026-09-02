@@ -11,17 +11,24 @@ def main() -> None:
 
     consumer = Consumer(
         {
-            "bootstrap.servers": (
-                f'{os.environ["KAFKA_HOST"]}:'
-                f'{os.environ.get("KAFKA_PORT", "9091")}'
+            "bootstrap.servers": os.environ["KAFKA_BOOTSTRAP_SERVERS"],
+            "security.protocol": os.environ.get(
+                "KAFKA_SECURITY_PROTOCOL",
+                "PLAINTEXT",
             ),
-            "security.protocol": "SASL_SSL",
-            "ssl.ca.location": os.environ["CERT_PATH"],
-            "sasl.mechanism": "SCRAM-SHA-512",
-            "sasl.username": os.environ["KAFKA_USER"],
-            "sasl.password": os.environ["KAFKA_PASSWORD"],
             "group.id": group,
             "enable.auto.commit": False,
+
+            **(
+                {
+                    "ssl.ca.location": os.environ["CERT_PATH"],
+                    "sasl.mechanism": "SCRAM-SHA-512",
+                    "sasl.username": os.environ["KAFKA_USER"],
+                    "sasl.password": os.environ["KAFKA_PASSWORD"],
+                }
+                if os.environ.get("KAFKA_SECURITY_PROTOCOL") == "SASL_SSL"
+                else {}
+            ),
         }
     )
 
