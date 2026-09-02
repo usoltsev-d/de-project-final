@@ -65,15 +65,11 @@ SELECT
      -- Количество проведённых транзакций
     t.cnt_transactions,
 
-    -- Средний объём транзакций в USD на один уникальный счёт отправителя.
+    -- Среднее количество проведённых транзакций на один уникальный счёт отправителя.
     if(
         t.cnt_accounts_make_transactions = 0,
         0.0,
-        round(
-            (t.amount_in_currency * r.currency_rate)
-            / t.cnt_accounts_make_transactions,
-            2
-        )
+        t.cnt_transactions / t.cnt_accounts_make_transactions
     ) AS avg_transactions_per_account,
 
     --  Количество уникальных аккаунтов с совершёнными транзакциями по валюте
