@@ -8,7 +8,8 @@ def error_callback(err) -> None:
 class KafkaConsumer:
     def __init__(
         self,
-        bootstrap_servers: str,
+        host: str,
+        port: int,
         topic: str,
         group: str,
         security_protocol: str = "PLAINTEXT",
@@ -17,7 +18,7 @@ class KafkaConsumer:
         cert_path: str | None = None,
     ) -> None:
         params = {
-            "bootstrap.servers": bootstrap_servers,
+            "bootstrap.servers": f"{host}:{port}",
             "security.protocol": security_protocol,
             "group.id": group,
             "auto.offset.reset": "earliest",
