@@ -21,7 +21,6 @@ def check_missing_usd_rates(
         password=conn.password,
     )
 
-
     sql_dir = Path("src/sql/scripts/cdm")
 
     repository = CdmRepository(
