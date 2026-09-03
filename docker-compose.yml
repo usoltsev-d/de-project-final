@@ -129,9 +129,7 @@ services:
           --conn-host clickhouse \
           --conn-login "${CLICKHOUSE_USER}" \
           --conn-password "${CLICKHOUSE_PASSWORD}" \
-          --conn-port 8123 \
-          --conn-schema raw \
-          --conn-extra '{"secure": false}' &&
+          --conn-port 8123 &&
 
         airflow variables set stg_batch_size 100000 &&
         airflow variables set stg_transactions_last_offset -1 &&
