@@ -21,9 +21,9 @@ def main() -> None:
         port=int(os.environ["KAFKA_PORT"]),
         topic=os.environ["KAFKA_TOPIC"],
         group=os.environ["KAFKA_CONSUMER_GROUP"],
-        user=os.environ.get("KAFKA_USER"),
-        password=os.environ.get("KAFKA_PASSWORD"),
-        cert_path=os.environ.get("CERT_PATH"),
+        user=os.environ["KAFKA_USER"],
+        password=os.environ["KAFKA_PASSWORD"],
+        cert_path=os.environ["CERT_PATH"],
     )
 
     client = clickhouse_connect.get_client(
@@ -31,15 +31,7 @@ def main() -> None:
         port=int(os.environ["CLICKHOUSE_PORT"]),
         username=os.environ["CLICKHOUSE_USER"],
         password=os.environ["CLICKHOUSE_PASSWORD"],
-        database=os.environ.get(
-            "CLICKHOUSE_DATABASE",
-            "raw",
-        ),
-        secure=os.environ.get(
-            "CLICKHOUSE_SECURE",
-            "false",
-        ).lower() == "true",
-        ca_cert=os.environ.get("CERT_PATH"),
+        database=os.environ["CLICKHOUSE_DATABASE"],
     )
 
     repository = RawRepository(
