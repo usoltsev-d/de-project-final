@@ -133,9 +133,15 @@ services:
           --conn-password "${CLICKHOUSE_PASSWORD}" \
           --conn-port 8123 &&
 
-        airflow variables set stg_batch_size 100000 &&
-        airflow variables set stg_transactions_last_offset -1 &&
-        airflow variables set stg_currencies_last_offset -1 &&
+        airflow variables get stg_batch_size >/dev/null 2>&1 ||
+        airflow variables set stg_batch_size 50000
+
+        airflow variables get stg_transactions_last_offset >/dev/null 2>&1 ||
+        airflow variables set stg_transactions_last_offset -1
+
+        airflow variables get stg_currencies_last_offset >/dev/null 2>&1 ||
+        airflow variables set stg_currencies_last_offset -1
+
         airflow variables set dds_start_date 2022-10-01 &&
         airflow variables set dds_end_date 2022-11-01 &&
         airflow variables set cdm_start_date 2022-10-01 &&
