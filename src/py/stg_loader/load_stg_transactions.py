@@ -24,7 +24,6 @@ def load_stg_transactions(
     kafka_partition = 0
 
     conn = BaseHook.get_connection("clickhouse_conn")
-    extra = conn.extra_dejson
 
     client = clickhouse_connect.get_client(
         host=conn.host,
