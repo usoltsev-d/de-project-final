@@ -31,9 +31,6 @@ def load_stg_transactions(
         port=conn.port,
         username=conn.login,
         password=conn.password,
-        database=conn.schema or "raw",
-        secure=extra.get("secure", False),
-        ca_cert=extra.get("cert_path"),
     )
 
     sql_dir = Path("src/sql/scripts/stg")
