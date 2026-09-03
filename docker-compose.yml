@@ -5,8 +5,8 @@ services:
     container_name: de-clickhouse
 
     ports:
-      - "${CLICKHOUSE_HTTP_PORT}:8123"
-      - "${CLICKHOUSE_NATIVE_PORT}:9000"
+      - "8123:8123"
+      - "9000:9000"
 
     environment:
       CLICKHOUSE_USER: ${CLICKHOUSE_USER}
@@ -149,7 +149,7 @@ services:
     container_name: de-airflow-webserver
 
     ports:
-      - "${AIRFLOW_PORT}:8080"
+      - "8080:8080"
 
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
