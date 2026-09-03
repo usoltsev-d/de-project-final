@@ -124,6 +124,8 @@ services:
           --role Admin \
           --email admin@example.com
 
+        airflow connections delete clickhouse_conn || true
+
         airflow connections add clickhouse_conn \
           --conn-type clickhouse \
           --conn-host clickhouse \
