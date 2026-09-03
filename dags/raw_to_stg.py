@@ -9,7 +9,7 @@ from stg_loader.load_stg_transactions import load_stg_transactions
 
 @dag(
     dag_id="raw_to_stg",
-    schedule="* * * * *",
+    schedule="@continuous",
     start_date=datetime(2022, 10, 1),
     catchup=False,
     max_active_runs=1,
