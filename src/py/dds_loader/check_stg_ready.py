@@ -16,16 +16,12 @@ def is_stg_date_ready(
     ).date()
 
     conn = BaseHook.get_connection("clickhouse_conn")
-    extra = conn.extra_dejson
 
     client = clickhouse_connect.get_client(
         host=conn.host,
         port=conn.port,
         username=conn.login,
         password=conn.password,
-        database=conn.schema or "raw",
-        secure=extra.get("secure", False),
-        ca_cert=extra.get("cert_path"),
     )
 
     sql_dir = Path("src/sql/scripts/stg")

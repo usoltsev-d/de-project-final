@@ -13,16 +13,12 @@ def check_transactions_exist(
 ) -> None:
 
     conn = BaseHook.get_connection("clickhouse_conn")
-    extra = conn.extra_dejson
 
     client = clickhouse_connect.get_client(
         host=conn.host,
         port=conn.port,
         username=conn.login,
         password=conn.password,
-        database=conn.schema or "dds",
-        secure=extra.get("secure", False),
-        ca_cert=extra.get("cert_path"),
     )
 
     sql_dir = Path("src/sql/scripts/dds")
