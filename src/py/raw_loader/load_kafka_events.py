@@ -21,10 +21,6 @@ def main() -> None:
         port=int(os.environ["KAFKA_PORT"]),
         topic=os.environ["KAFKA_TOPIC"],
         group=os.environ["KAFKA_CONSUMER_GROUP"],
-        security_protocol=os.environ.get(
-            "KAFKA_SECURITY_PROTOCOL",
-            "PLAINTEXT",
-        ),
         user=os.environ.get("KAFKA_USER"),
         password=os.environ.get("KAFKA_PASSWORD"),
         cert_path=os.environ.get("CERT_PATH"),

@@ -12,28 +12,23 @@ class KafkaConsumer:
         port: int,
         topic: str,
         group: str,
-        security_protocol: str = "PLAINTEXT",
-        user: str | None = None,
-        password: str | None = None,
-        cert_path: str | None = None,
+        user: str,
+        password: str,
+        cert_path: str,
     ) -> None:
         params = {
             "bootstrap.servers": f"{host}:{port}",
-            "security.protocol": security_protocol,
+            "security.protocol": "SASL_SSL",
+            "ssl.ca.location": cert_path,
+            "sasl.mechanism": "SCRAM-SHA-512",
+            "sasl.username": user,
+            "sasl.password": password,
             "group.id": group,
             "auto.offset.reset": "earliest",
             "enable.auto.commit": False,
             "error_cb": error_callback,
             "client.id": "raw-loader",
         }
-
-        if security_protocol == "SASL_SSL":
-            params.update({
-                "ssl.ca.location": cert_path,
-                "sasl.mechanism": "SCRAM-SHA-512",
-                "sasl.username": user,
-                "sasl.password": password,
-            })
 
         self._consumer = Consumer(params)
         self._consumer.subscribe([topic])
