@@ -114,7 +114,14 @@ password: admin
 docker compose down
 ```
 
-`reset_kafka_offsets.py` для полного реплей данных из Kafka.
+`reset_kafka_offsets.py` для полного реплея данных из Kafka.
+
+```bash
+docker compose run --rm --no-deps \
+  -v "$(pwd)/reset_kafka_offsets.py:/app/reset_kafka_offsets.py:ro" \
+  raw-loader \
+  python /app/reset_kafka_offsets.py
+```
 
 ## Структура проекта
 - `dags/` — DAG Apache Airflow;
@@ -124,6 +131,6 @@ docker compose down
 - `src/py/cdm_loader/` — DDS -> CDM;
 - `src/sql/ddl/` — DDL объектов ClickHouse;
 - `src/sql/scripts/` — SQL загрузки и проверки данных;
-- `src/img/` — скриншоты дашборда;
-- `certs/` — CA-сертификат Kafka;
+- `src/img/` — скриншоты;
+- `certs/` — CA-сертификаты;
 - `docker-compose.yml` — инфраструктура проекта.
